@@ -22,3 +22,19 @@ spring:
     show-sql: true
   main:
     web-application-type: servlet
+
+# CORS configuration
+  servlet:
+    filter-registration:
+      cors:
+        filter-name: corsFilter
+        url-pattern: /*
+        allowed-origins:
+          - http://localhost:3000
+        allowed-methods:
+          - GET
+          - POST
+          - PUT
+        allowed-headers:
+          - Content-Type
+          - Authorization

@@ -1,9 +1,10 @@
 package com.asss.management.entity;
 
-import com.asss.management.entity.Enums.PgSQLEnumType;
+import com.asss.management.entity.Enums.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
@@ -46,10 +47,21 @@ public class Student {
     )
     private String lastName;
     @Column(
+            name = "renewed",
+            nullable = false
+    )
+    private Boolean renewed;
+    @Column(
             name = "middle_name",
             nullable = false
     )
     private String middleName;
+    @Column(
+            name = "email",
+            nullable = false,
+            unique = true
+    )
+    private String email;
     @Column(
             name = "jmbg",
             nullable = false,
@@ -76,31 +88,32 @@ public class Student {
             nullable = false
     )
     private Date birthDate;
-    @Column(
-            name = "gender",
-            nullable = false
-    )
-    private String gender;
-    @Column(
-            name = "course_of_studies",
-            nullable = false
-    )
-    private String courseOfStudies;
-    @Column(
-            name = "type_of_studies",
-            nullable = false
-    )
-    private String typeOfStudies;
-    @Column(
-            name = "year_of_studies",
-            nullable = false
-    )
-    private Integer yearOfStudies;
-    @Column(
-            name = "status",
-            nullable = false
-    )
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "gender")
+    @Type( type = "pgsql_enum" )
+    private Gender gender;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "course_of_studies")
+    @Type( type = "pgsql_enum" )
+    private Course_of_studies courseOfStudies;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "type_of_studies")
+    @Type( type = "pgsql_enum" )
+    private Type_of_studies typeOfStudies;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "year_of_studies")
+    @Type( type = "pgsql_enum" )
+    private Year_of_studies yearOfStudies;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "status")
+    @Type( type = "pgsql_enum" )
+    private Student_status status;
+
     @Column(
             name = "updated_at",
             nullable = false
@@ -110,7 +123,7 @@ public class Student {
             name = "updated_by",
             nullable = false
     )
-    private Date updatedBy;
+    private Integer updatedBy;
     @Column(
             name = "created_at",
             nullable = false
@@ -120,5 +133,5 @@ public class Student {
             name = "created_by",
             nullable = false
     )
-    private Date createdBy;
+    private Integer createdBy;
 }

@@ -1,6 +1,7 @@
 package com.asss.management.entity;
 
 import com.asss.management.entity.Enums.*;
+import com.asss.management.service.dto.EmployeeDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "students")
+@Table(name = "employees")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,17 +20,17 @@ import java.util.Date;
         name = "pgsql_enum",
         typeClass = PgSQLEnumType.class
 )
-public class Student {
+public class Employee {
 
     @Id
     @SequenceGenerator(
-            name = "new_student_sequence",
-            sequenceName = "new_student_sequence",
+            name = "new_employee_sequence",
+            sequenceName = "new_employee_sequence",
             allocationSize = 1
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "new_student_sequence"
+            generator = "new_employee_sequence"
     )
     @Column(
             updatable = false,
@@ -47,11 +48,6 @@ public class Student {
     )
     private String lastName;
     @Column(
-            name = "renewed",
-            nullable = false
-    )
-    private Boolean renewed;
-    @Column(
             name = "middle_name",
             nullable = false
     )
@@ -68,12 +64,6 @@ public class Student {
             unique = true
     )
     private Integer jmbg;
-    @Column(
-            name = "index",
-            nullable = false,
-            unique = true
-    )
-    private String index;
     @Column(
             name = "password",
             nullable = false
@@ -95,44 +85,25 @@ public class Student {
     private Gender gender;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "course_of_studies")
+    @Column(columnDefinition = "employee_category")
     @Type( type = "pgsql_enum" )
-    private Course_of_studies courseOfStudies;
-
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "type_of_studies")
-    @Type( type = "pgsql_enum" )
-    private Type_of_studies typeOfStudies;
-
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "year_of_studies")
-    @Type( type = "pgsql_enum" )
-    private Year_of_studies yearOfStudies;
+    private Employee_category employeeCategory;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "status")
     @Type( type = "pgsql_enum" )
-    private Student_status status;
+    private Employee_status status;
 
     @Column(
-            name = "updated_at",
-            nullable = false
+            name = "updated_at"
     )
     private Date updatedAt;
     @Column(
-            name = "updated_by",
-            nullable = false
+            name = "updated_by"
     )
     private Integer updatedBy;
     @Column(
-            name = "created_at",
-            nullable = false
+            name = "created_at"
     )
     private Date createdAt;
-    @OneToOne(targetEntity = Employee.class, cascade = CascadeType.ALL)
-    @JoinColumn(
-            name = "created_by",
-            referencedColumnName = "id"
-    )
-    private Employee createdBy;
 }

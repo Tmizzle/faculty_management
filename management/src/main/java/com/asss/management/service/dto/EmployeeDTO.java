@@ -1,8 +1,8 @@
 package com.asss.management.service.dto;
 
+import com.asss.management.entity.Employee;
 import com.asss.management.entity.Enums.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentDTO {
+public class EmployeeDTO {
 
     private Integer id;
     private String firstName;
@@ -20,20 +20,14 @@ public class StudentDTO {
     private String middleName;
     private Integer jmbg;
     private String email;
-    private String index;
     private Gender gender;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthDate;
-    private Course_of_studies courseOfStudies;
-    private Year_of_studies yearOfStudies;
-    private Type_of_studies typeOfStudies;
-    private Boolean renewed;
-    private Student_status status;
+    private Employee_category employeeCategory;
+    private Employee_status status;
     @JsonFormat(pattern = "yyyy-MM-dd HH-mm")
     private Date updatedAt;
     private Integer updatedBy;
     @JsonFormat(pattern = "yyyy-MM-dd HH-mm")
     private Date createdAt;
-    @JsonIgnoreProperties(value = {"middleName", "jmbg", "gender", "birthDate", "status", "updatedAt", "updatedBy", "createdAt"})
-    private EmployeeDTO createdBy;
 }

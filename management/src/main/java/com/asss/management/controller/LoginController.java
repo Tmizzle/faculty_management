@@ -1,7 +1,6 @@
 package com.asss.management.controller;
 
 import com.asss.management.service.implementation.LoginService;
-import io.jsonwebtoken.Jwts;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import java.util.Map;
 @RequestMapping(path = "/api/login")
 @Data
 @Tag(name = "Login API", description = "API for managing logins")
+@CrossOrigin(origins = "*")
 public class LoginController {
 
     private final LoginService loginService;

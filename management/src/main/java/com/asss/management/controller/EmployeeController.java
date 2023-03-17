@@ -3,15 +3,15 @@ package com.asss.management.controller;
 import com.asss.management.service.dto.EmployeeDTO;
 import com.asss.management.service.implementation.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,6 +19,7 @@ import java.util.List;
 @RequestMapping(path = "/api/employee")
 @Data
 @Tag(name = "Employee API", description = "API for managing employees")
+@CrossOrigin(origins = "*")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -33,5 +34,23 @@ public class EmployeeController {
     @GetMapping
     public List<EmployeeDTO> getEmployees(){
         return employeeService.getEmployee();
+    }
+
+    @GetMapping(path = "/getEmployeeById/")
+    public EmployeeDTO getEmployeeById(@RequestParam String token){
+        return employeeService.getUserInfoFromToken(token);
+    }
+
+    @PutMapping(path = "{id}")
+    public ResponseEntity updateEmployee(
+            @PathVariable("id") Integer id,
+            @Parameter(description = "Employee first name") @RequestParam(required = false) String firstName,
+            @Parameter(description = "Employee last name") @RequestParam(required = false) String lastName,
+            @Parameter(description = "Employee middle name") @RequestParam(required = false) String middleName,
+            @Parameter(description = "Employee email") @RequestParam(required = false) String email
+    ) {
+        employeeService.updateEmployee(id, firstName, lastName, middleName, email);
+
+        return ResponseEntity.ok("Employee updated successfully");
     }
 }

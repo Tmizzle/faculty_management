@@ -21,13 +21,13 @@ public class EmployeeDTO {
     private Integer jmbg;
     private String email;
     private Gender gender;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private Date birthDate;
     private Employee_category employeeCategory;
     private Employee_status status;
-    @JsonFormat(pattern = "yyyy-MM-dd HH-mm")
+    @JsonFormat(pattern = "dd-MM-yyyy HH-mm")
     private Date updatedAt;
     private Integer updatedBy;
-    @JsonFormat(pattern = "yyyy-MM-dd HH-mm")
+    @JsonFormat(pattern = "dd-MM-yyyy HH-mm")
     private Date createdAt;
 }

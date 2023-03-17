@@ -11,7 +11,6 @@ import io.jsonwebtoken.security.Keys;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
@@ -48,6 +47,7 @@ public class EmployeeService {
 
     @Transactional
     public void updateEmployee(Integer id,
+                                   String token,
                                    String firstName,
                                    String lastName,
                                    String middleName,
@@ -55,23 +55,26 @@ public class EmployeeService {
         LocalDateTime currentDateTime = LocalDateTime.now();
         Date currentDate = java.util.Date.from(currentDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
+        Claims claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
+        Integer userId = claims.get("id", Integer.class);
+
         Employee employee = employeeRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Specified employee has not been found."));
 
         if (firstName != null && !Objects.equals(employee.getFirstName(), firstName)) {
             employee.setFirstName(firstName);
             employee.setUpdatedAt(currentDate);
-            employee.setUpdatedBy(id);
+            employee.setUpdatedBy(userId);
         }
         if (lastName != null && !Objects.equals(employee.getLastName(), lastName)) {
             employee.setLastName(lastName);
             employee.setUpdatedAt(currentDate);
-            employee.setUpdatedBy(id);
+            employee.setUpdatedBy(userId);
         }
         if (middleName != null && !Objects.equals(employee.getMiddleName(), middleName)) {
             employee.setMiddleName(middleName);
             employee.setUpdatedAt(currentDate);
-            employee.setUpdatedBy(id);
+            employee.setUpdatedBy(userId);
         }
         if (email != null && !Objects.equals(employee.getEmail(), email)) {
             Employee emailCheck = employeeRepo.findByEmail(email);
@@ -80,6 +83,25 @@ public class EmployeeService {
             }
             employee.setEmail(email);
             employee.setUpdatedAt(currentDate);
-            employee.setUpdatedBy(id);
+            employee.setUpdatedBy(userId);
         }
-}}
+
+    }
+    // add new employee
+    public void addNewEmployee(Employee employee) {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        Date currentDate = java.util.Date.from(currentDateTime.atZone(ZoneId.systemDefault()).toInstant());
+
+        Employee emailCheck = employeeRepo.findByEmail(employee.getEmail());
+        // Internal code unique check
+        if (emailCheck != null){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+        }
+        Employee jmbgCheck = employeeRepo.findByJMBG(employee.getJmbg());
+        if(jmbgCheck != null){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "JMBG already in use");
+        }
+        employee.setCreatedAt(currentDate);
+        employeeRepo.save(employee);
+    }
+}

@@ -1,5 +1,6 @@
 package com.asss.management.controller;
 
+import com.asss.management.entity.Employee;
 import com.asss.management.service.dto.EmployeeDTO;
 import com.asss.management.service.implementation.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,13 +45,21 @@ public class EmployeeController {
     @PutMapping(path = "{id}")
     public ResponseEntity updateEmployee(
             @PathVariable("id") Integer id,
+            @Parameter(description = "Session token") @RequestParam String token,
             @Parameter(description = "Employee first name") @RequestParam(required = false) String firstName,
             @Parameter(description = "Employee last name") @RequestParam(required = false) String lastName,
             @Parameter(description = "Employee middle name") @RequestParam(required = false) String middleName,
             @Parameter(description = "Employee email") @RequestParam(required = false) String email
     ) {
-        employeeService.updateEmployee(id, firstName, lastName, middleName, email);
+        employeeService.updateEmployee(id, token, firstName, lastName, middleName, email);
 
         return ResponseEntity.ok("Employee updated successfully");
+    }
+
+    @PostMapping
+    public ResponseEntity addNewEmployee(@RequestBody Employee employee){
+        employeeService.addNewEmployee(employee);
+
+        return ResponseEntity.ok("Added a new employee successfully");
     }
 }

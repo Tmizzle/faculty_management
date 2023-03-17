@@ -13,4 +13,7 @@ public interface EmployeeRepo extends JpaRepository<Employee, Integer> {
 
     @Query("SELECT e FROM Employee e WHERE e.email= ?1")
     Employee findByEmail(String email);
+
+    @Query("SELECT e FROM Employee e WHERE e.jmbg= ?1")
+    Employee findByJMBG(Integer jmbg);
 }

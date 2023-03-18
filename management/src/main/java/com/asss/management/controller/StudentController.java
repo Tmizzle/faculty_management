@@ -1,8 +1,6 @@
 package com.asss.management.controller;
 
-import com.asss.management.entity.Employee;
 import com.asss.management.entity.Student;
-import com.asss.management.service.dto.EmployeeDTO;
 import com.asss.management.service.dto.StudentDTO;
 import com.asss.management.service.implementation.StudentService;
 import io.swagger.v3.oas.annotations.Operation;

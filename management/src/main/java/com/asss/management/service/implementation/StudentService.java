@@ -4,6 +4,7 @@ import com.asss.management.dao.EmployeeRepo;
 import com.asss.management.dao.StudentRepo;
 import com.asss.management.entity.Employee;
 import com.asss.management.entity.Student;
+import com.asss.management.service.dto.EmployeeDTO;
 import com.asss.management.service.dto.StudentDTO;
 import com.asss.management.service.mapper.StudentMapper;
 import io.jsonwebtoken.Claims;
@@ -47,6 +48,14 @@ public class StudentService {
         if(student == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student with that index doesn't exist");
         }
+        StudentDTO studentDTO = studentMapper.entityToDTO(student);
+        return studentDTO;
+    }
+
+    public StudentDTO getUserInfoFromToken(String token) {
+        Claims claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
+        Integer userId = claims.get("id", Integer.class);
+        Student student = studentRepo.findById(userId).orElse(null);
         StudentDTO studentDTO = studentMapper.entityToDTO(student);
         return studentDTO;
     }

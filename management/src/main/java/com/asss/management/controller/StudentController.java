@@ -42,6 +42,11 @@ public class StudentController {
         return studentService.getStudentByIndex(index);
     }
 
+    @GetMapping(path = "/getStudentById/")
+    public StudentDTO getStudebtById(@RequestParam String token){
+        return studentService.getUserInfoFromToken(token);
+    }
+
     @PostMapping
     public ResponseEntity addNewStudent(@RequestBody Student student, @RequestParam String token){
         studentService.addNewStudent(student, token);

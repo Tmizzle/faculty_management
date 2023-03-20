@@ -17,4 +17,5 @@ public class SubjectsDTO {
     private Year_of_studies year;
     private Semester semester;
     private Course_of_studies course;
+    private Integer espb;
 }

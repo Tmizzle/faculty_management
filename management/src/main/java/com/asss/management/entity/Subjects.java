@@ -57,4 +57,10 @@ public class Subjects {
     @Type( type = "pgsql_enum" )
     private Course_of_studies course;
 
+    @Column(
+            name = "espb",
+            nullable = false
+    )
+    private Integer espb;
+
 }

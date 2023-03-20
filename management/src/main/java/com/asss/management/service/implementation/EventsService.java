@@ -195,7 +195,7 @@ public class EventsService {
 
         Events eventOngoingCheck = eventsRepo.ongoingEvent(currentDate, eventID);
         if(eventOngoingCheck != null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't delete an ongoing event");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can't delete an ongoing event");
         }
         eventsRepo.delete(event);
     }

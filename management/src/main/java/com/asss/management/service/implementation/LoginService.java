@@ -2,6 +2,8 @@ package com.asss.management.service.implementation;
 
 import com.asss.management.dao.EmployeeRepo;
 import com.asss.management.entity.Employee;
+import com.asss.management.service.dto.EmployeeDTO;
+import com.asss.management.service.mapper.EmployeeMapper;
 import io.jsonwebtoken.security.Keys;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import java.util.Map;
 public class LoginService {
 
     private final EmployeeRepo employeeRepo;
+    private final EmployeeMapper employeeMapper;
 
     private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
@@ -44,6 +47,7 @@ public class LoginService {
 
     public String LoginEmployee(String email, String password){
         Employee employee = employeeRepo.loginEmployeeParams(email, password);
+        EmployeeDTO employeeDTO = employeeMapper.entityToDTO(employee);
         if(employee == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong params");
         }

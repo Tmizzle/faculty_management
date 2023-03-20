@@ -1,7 +1,6 @@
 package com.asss.management.entity;
 
 import com.asss.management.entity.Enums.*;
-import com.asss.management.service.dto.EmployeeDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

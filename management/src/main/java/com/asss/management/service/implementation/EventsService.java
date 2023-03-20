@@ -31,7 +31,7 @@ public class EventsService {
     private final EventsRepo eventsRepo;
     private final EventsMapper eventsMapper;
 
-    // Retrieves all students
+    // Retrieves all events
     public List<EventsDTO> getEvents() {
         List<Events> eventsList = eventsRepo.findAll();
         List<EventsDTO> eventsDTOList = eventsMapper.entitiesToDTOs(eventsList);
@@ -46,20 +46,8 @@ public class EventsService {
         return eventsDTO;
     }
 
-    public void addNewEvent(Events event){
+    public void addNewEvent(Events event) {
         List<Events> eventsListCheck = eventsRepo.eventOverlapCheck(event.getEndDate(), event.getStartDate());
-        //List<Events> eventsListCheckByType = eventsRepo.eventOverlapCheckForEnrollment(event.getEndDate(), event.getStartDate(), event.getType().toString());
-
-        for (Events e : eventsListCheck) {
-            if(e.getType() == event.getType()){
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Event of such type for that period already exists");
-            }
-            if(event.getType() == Type_of_event.EXAM_PERIOD || event.getType() == Type_of_event.EXTRA_EXAM_PERIOD){
-                if(e.getType() == Type_of_event.EXAM_PERIOD || e.getType() == Type_of_event.EXTRA_EXAM_PERIOD){
-                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Event of such type for that period already exists 2");
-                }
-            }
-        }
 
         Date startDate = event.getStartDate();
         Date endDate = event.getEndDate();
@@ -67,14 +55,30 @@ public class EventsService {
         LocalDate startLocalDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate endLocalDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
+        if (endLocalDate.isBefore(startLocalDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "End date can not be before start date");
+        }
+        for (Events e : eventsListCheck) {
+            if (e.getName() != event.getName()) {
+                if (e.getType() == event.getType()) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Event of such type for that period already exists");
+                }
+                if (event.getType() == Type_of_event.EXAM_PERIOD || event.getType() == Type_of_event.EXTRA_EXAM_PERIOD) {
+                    if (e.getType() == Type_of_event.EXAM_PERIOD || e.getType() == Type_of_event.EXTRA_EXAM_PERIOD) {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Event of such type for that period already exists 2");
+                    }
+                }
+            }
+        }
+
         long daysBetween = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
         int days = (int) daysBetween + 1;
-        if(event.getType() == Type_of_event.EXTRA_EXAM_PERIOD && days > 7){
+        if (event.getType() == Type_of_event.EXTRA_EXAM_PERIOD && days > 7) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Extra exam periods can't be longer then 7 days");
         }
         eventsRepo.save(event);
 
-        if(event.getType() == Type_of_event.EXAM_REGISTRATION){
+        if (event.getType() == Type_of_event.EXAM_REGISTRATION) {
             Events extraEvent = new Events();
             extraEvent.setName(event.getName());
             extraEvent.setType(Type_of_event.EXAM_REGISTRATION_LATE);
@@ -89,45 +93,110 @@ public class EventsService {
             eventsRepo.save(extraEvent);
         }
     }
+
     @Transactional
     public void updateEvent(Integer id,
-                              String name,
-                              Date startDate,
-                              Date endDate) {
+                            String name,
+                            Date startDate,
+                            Date endDate) {
         Events event = eventsRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Specified event has not been found."));
         if (name != null && !Objects.equals(event.getName(), name)) {
             event.setName(name);
         }
-        if (startDate != null && endDate != null && event.getType() == Type_of_event.EXAM_REGISTRATION) {
-            int numberOfEvents = 0;
-            List<Events> eventsListCheck = eventsRepo.eventOverlapCheck(startDate, endDate);
+        if (event.getType() == Type_of_event.EXAM_REGISTRATION) {
+            List<Events> eventsListCheck = eventsRepo.eventOverlapCheck(endDate, startDate);
+            if(startDate == null){
+                startDate = event.getStartDate();
+            }
+            if(endDate == null){
+                endDate = event.getEndDate();
+            }
             for (Events e : eventsListCheck) {
-                if (e.getType() == event.getType()) {
-                    numberOfEvents++;
+                if (e.getName() != event.getName()) {
+                    if (e.getType() == event.getType()) {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Event of such type for that period already exists");
+                    }
+                    if (event.getType() == Type_of_event.EXAM_PERIOD || event.getType() == Type_of_event.EXTRA_EXAM_PERIOD) {
+                        if (e.getType() == Type_of_event.EXAM_PERIOD || e.getType() == Type_of_event.EXTRA_EXAM_PERIOD) {
+                            throw new ResponseStatusException(HttpStatus.CONFLICT, "Event of such type for that period already exists 2");
+                        }
                     }
                 }
-                if (numberOfEvents > 1) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Event of such type for that period already exists");
-                }
-                LocalDate localStartDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                LocalDate extraStartDate = localStartDate.plusDays(1);
-                LocalDate extraEndDate = localStartDate.plusDays(2);
-                Date extraStartDateAsDate = Date.from(extraStartDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-                Date extraEndDateAsDate = Date.from(extraEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-                LocalDate findLateEvent = event.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                LocalDate findLateEventPlusOne = findLateEvent.plusDays(1);
-                Date findLateEventFinal = Date.from(findLateEventPlusOne.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-                Events LateExamPeriodUpdate = eventsRepo.lateExamPeriodUpdate(findLateEventFinal);
-
-                LateExamPeriodUpdate.setStartDate(extraStartDateAsDate);
-                LateExamPeriodUpdate.setEndDate(extraEndDateAsDate);
-
-                event.setStartDate(startDate);
-                event.setEndDate(endDate);
-
             }
+            LocalDate localEndDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate localStartDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate extraStartDate = localEndDate.plusDays(1);
+            LocalDate extraEndDate = localEndDate.plusDays(2);
+            Date extraStartDateAsDate = Date.from(extraStartDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date extraEndDateAsDate = Date.from(extraEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+            LocalDate findLateEvent = event.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate findLateEventPlusOne = findLateEvent.plusDays(1);
+            Date findLateEventFinal = Date.from(findLateEventPlusOne.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+            if (localEndDate.isBefore(localStartDate)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "End date can not be before start date");
+            }
+
+            Events LateExamPeriodUpdate = eventsRepo.lateExamPeriodUpdate(findLateEventFinal);
+
+            LateExamPeriodUpdate.setStartDate(extraStartDateAsDate);
+            LateExamPeriodUpdate.setEndDate(extraEndDateAsDate);
+
+            event.setStartDate(startDate);
+            event.setEndDate(endDate);
+
         }
+        if (event.getType() != Type_of_event.EXAM_REGISTRATION) {
+            if(startDate == null){
+                startDate = event.getStartDate();
+            }
+            if(endDate == null){
+                endDate = event.getEndDate();
+            }
+            List<Events> eventsListCheck = eventsRepo.eventOverlapCheck(endDate, startDate);
+            for (Events e : eventsListCheck) {
+                if (e.getName() != event.getName()) {
+                    if (e.getType() == event.getType()) {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Event of such type for that period already exists");
+                    }
+                    if (event.getType() == Type_of_event.EXAM_PERIOD || event.getType() == Type_of_event.EXTRA_EXAM_PERIOD) {
+                        if (e.getType() == Type_of_event.EXAM_PERIOD || e.getType() == Type_of_event.EXTRA_EXAM_PERIOD) {
+                            throw new ResponseStatusException(HttpStatus.CONFLICT, "Event of such type for that period already exists 2");
+                        }
+                    }
+                }
+            }
+            LocalDate startLocalDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate endLocalDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            if (endLocalDate.isBefore(startLocalDate)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "End date can not be before start date");
+            }
+
+            long daysBetween = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
+            int days = (int) daysBetween + 1;
+            if (event.getType() == Type_of_event.EXTRA_EXAM_PERIOD && days > 7) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Extra exam periods can't be longer then 7 days");
+            }
+
+            event.setStartDate(startDate);
+            event.setEndDate(endDate);
+        }
+    }
+    public void deleteEvent(Integer eventID){
+        Events event = eventsRepo.findById(eventID).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Specified event has not been found."));
+
+        // gets current time
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        Date currentDate = java.util.Date.from(currentDateTime.atZone(ZoneId.systemDefault()).toInstant());
+
+        Events eventOngoingCheck = eventsRepo.ongoingEvent(currentDate, eventID);
+        if(eventOngoingCheck != null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't delete an ongoing event");
+        }
+        eventsRepo.delete(event);
+    }
 }

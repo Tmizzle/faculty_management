@@ -52,4 +52,11 @@ public class EventsController {
 
         return ResponseEntity.ok("Event updated successfully");
     }
+
+    @DeleteMapping(path = "{id}")
+    public ResponseEntity deleteProjectMember(@Parameter(description = "ID of the event", example = "1") @PathVariable("id") Integer eventID ){
+        eventsService.deleteEvent(eventID);
+
+        return ResponseEntity.ok("Event successfully removed from that project");
+    }
 }

@@ -24,4 +24,10 @@ public interface EventsRepo extends JpaRepository<Events, Integer> {
             nativeQuery = true)
     Events lateExamPeriodUpdate(Date startDate);
 
+    @Query(value = "SELECT * FROM events " +
+            "WHERE events.start_date <= ?1 AND events.end_date >= ?1 " +
+            "AND events.id = ?2 ;",
+            nativeQuery = true)
+    Events ongoingEvent(Date currentDate, Integer eventID);
+
 }

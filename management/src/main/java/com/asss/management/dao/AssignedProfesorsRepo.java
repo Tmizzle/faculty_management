@@ -10,8 +10,8 @@ import java.util.List;
 @Repository
 public interface AssignedProfesorsRepo extends JpaRepository<AssignedProfesors, Integer> {
 
-    @Query("SELECT a FROM AssignedProfesors a WHERE a.profesor.id= ?1")
-    List<AssignedProfesors> findByProfesor(Integer profesorID);
+    @Query("SELECT a FROM AssignedProfesors a WHERE a.profesor.email= ?1")
+    List<AssignedProfesors> findByProfesor(String profesorEmail);
 
     @Query("SELECT a FROM AssignedProfesors a WHERE a.subject.id= ?1")
     List<AssignedProfesors> findBySubject(Integer subjectID);

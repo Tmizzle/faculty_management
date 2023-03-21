@@ -6,11 +6,8 @@ import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
-@RequestMapping(path = "/api/login")
+@RequestMapping(path = "/api/public/login")
 @Data
 @Tag(name = "Login API", description = "API for managing logins")
 @CrossOrigin(origins = "*")
@@ -18,11 +15,10 @@ public class LoginController {
 
     private final LoginService loginService;
 
-    @PostMapping
-    public ResponseEntity<Map<String, String>> loginEmployee(@RequestParam String email, @RequestParam String password) {
-        String token = loginService.LoginEmployee(email, password);
-        Map<String, String> responseBody = new HashMap<>();
-        responseBody.put("token", token);
-        return ResponseEntity.ok(responseBody);
+    @PostMapping(path = "/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate(
+            @RequestBody AuthenticationRequest request
+    ) {
+        return ResponseEntity.ok(loginService.authenticate(request));
     }
 }

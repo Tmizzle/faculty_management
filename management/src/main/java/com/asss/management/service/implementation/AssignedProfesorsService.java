@@ -6,6 +6,7 @@ import com.asss.management.dao.SubjectsRepo;
 import com.asss.management.entity.AssignedProfesors;
 import com.asss.management.entity.Employee;
 import com.asss.management.entity.Subjects;
+import com.asss.management.securityConfig.JwtService;
 import com.asss.management.service.dto.AssignedProfesorsDTO;
 import com.asss.management.service.mapper.AssignedProfesorsMapper;
 import io.jsonwebtoken.Claims;
@@ -28,6 +29,7 @@ public class AssignedProfesorsService {
     private final AssignedProfesorsMapper assignedProfesorsMapper;
     private final EmployeeRepo employeeRepo;
     private final SubjectsRepo subjectsRepo;
+    private final JwtService jwtService;
 
     private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
@@ -39,9 +41,8 @@ public class AssignedProfesorsService {
     }
 
     public List<AssignedProfesorsDTO> getAssignedSubjectsForLoggedUser(String token) {
-        Claims claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
-        Integer userId = claims.get("id", Integer.class);
-        List<AssignedProfesors> assignedProfesorsList = assignedProfesorsRepo.findByProfesor(userId);
+        String userEmail = jwtService.extractUsername(token);
+        List<AssignedProfesors> assignedProfesorsList = assignedProfesorsRepo.findByProfesor(userEmail);
         List<AssignedProfesorsDTO> assignedProfesorsDTOList = assignedProfesorsMapper.entitiesToDTOs(assignedProfesorsList);
         return assignedProfesorsDTOList;
     }

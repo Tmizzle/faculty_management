@@ -37,6 +37,11 @@ public class PassedExamsController {
         return passedExamsService.getPassedExamsByProfesor(token);
     }
 
+    @GetMapping(path = "/getPassedExamsByStudent/")
+    public List<PassedExamsDTO> getPassedExamsByStudent(@RequestParam String token){
+        return passedExamsService.getPassedExamsByStudent(token);
+    }
+
     @PutMapping(path = "{id}")
     public ResponseEntity updatePassedExam(
             @PathVariable("id") Integer id,

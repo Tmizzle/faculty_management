@@ -3,6 +3,7 @@ package com.asss.management.service.mapper;
 import com.asss.management.entity.Employee;
 import com.asss.management.service.dto.EmployeeDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 

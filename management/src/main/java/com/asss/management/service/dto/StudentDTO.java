@@ -31,9 +31,11 @@ public class StudentDTO {
     private Student_status status;
     @JsonFormat(pattern = "yyyy-MM-dd HH-mm")
     private Date updatedAt;
-    private Integer updatedBy;
+    @JsonIgnoreProperties(value = {"middleName", "jmbg", "gender", "birthDate", "status", "updatedAt", "updatedBy", "createdAt"})
+    private EmployeeDTO updatedBy;
     @JsonFormat(pattern = "yyyy-MM-dd HH-mm")
     private Date createdAt;
     @JsonIgnoreProperties(value = {"middleName", "jmbg", "gender", "birthDate", "status", "updatedAt", "updatedBy", "createdAt"})
     private EmployeeDTO createdBy;
+    private Boolean budget;
 }

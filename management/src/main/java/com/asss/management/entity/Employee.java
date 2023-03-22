@@ -102,10 +102,12 @@ public class Employee implements UserDetails {
             name = "updated_at"
     )
     private Date updatedAt;
-    @Column(
-            name = "updated_by"
+    @OneToOne(targetEntity = Employee.class)
+    @JoinColumn(
+            name = "updated_by",
+            referencedColumnName = "id"
     )
-    private Integer updatedBy;
+    private Employee updatedBy;
     @Column(
             name = "created_at"
     )

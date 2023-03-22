@@ -12,4 +12,7 @@ public interface StudentHistoryRepo extends JpaRepository<StudentHistory, Intege
 
     @Query("SELECT s FROM StudentHistory s WHERE s.student.index= ?1 ")
     List<StudentHistory> studentHistoryByIndex(String index);
+
+    @Query("SELECT s FROM StudentHistory s WHERE s.student.email= ?1 ")
+    List<StudentHistory> studentHistoryByLoggedUser(String userEmail);
 }

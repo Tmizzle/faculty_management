@@ -3,6 +3,7 @@ package com.asss.management.service.implementation;
 import com.asss.management.dao.*;
 import com.asss.management.entity.*;
 import com.asss.management.entity.Enums.Type_of_event;
+import com.asss.management.securityConfig.JwtService;
 import com.asss.management.service.dto.AssignedProfesorsDTO;
 import com.asss.management.service.dto.PassedExamsDTO;
 import com.asss.management.service.mapper.PassedExamsMapper;
@@ -30,6 +31,7 @@ public class PassedExamsService {
     private final EventsRepo eventsRepo;
     private final StudentRepo studentRepo;
     private final SubjectsRepo subjectsRepo;
+    private final JwtService jwtService;
 
     private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
@@ -48,9 +50,15 @@ public class PassedExamsService {
     }
 
     public List<PassedExamsDTO> getPassedExamsByProfesor(String token) {
-        Claims claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
-        Integer userId = claims.get("id", Integer.class);
-        List<PassedExams> passedExamsList = passedExamsRepo.passedExamsByProfesor(userId);
+        String userEmail = jwtService.extractUsername(token);
+        List<PassedExams> passedExamsList = passedExamsRepo.passedExamsByProfesor(userEmail);
+        List<PassedExamsDTO> passedExamsDTOList = passedExamsMapper.entitiesToDTOs(passedExamsList);
+        return passedExamsDTOList;
+    }
+
+    public List<PassedExamsDTO> getPassedExamsByStudent(String token) {
+        String userEmail = jwtService.extractUsername(token);
+        List<PassedExams> passedExamsList = passedExamsRepo.passedExamsByStudent(userEmail);
         List<PassedExamsDTO> passedExamsDTOList = passedExamsMapper.entitiesToDTOs(passedExamsList);
         return passedExamsDTOList;
     }

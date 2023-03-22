@@ -34,6 +34,11 @@ public class StudentHistoryController {
         return studentHistoryService.getStudentHistoryByIndex(index);
     }
 
+    @GetMapping(path = "/getByLoggedUser/")
+    public List<StudentHistoryDTO> getByLoggedUser(@RequestParam String token){
+        return studentHistoryService.getStudentHistoryByLoggedUser(token);
+    }
+
     @PostMapping
     public ResponseEntity addNewStudentHistory(@RequestBody StudentHistory studentHistory, @RequestParam String token, @RequestParam String index){
         studentHistoryService.addNewStudentHistoryEntry(studentHistory, token, index);

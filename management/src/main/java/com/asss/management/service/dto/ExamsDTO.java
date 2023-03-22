@@ -1,5 +1,6 @@
 package com.asss.management.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,5 +20,6 @@ public class ExamsDTO {
     @JsonIgnoreProperties(value = {"middleName", "jmbg", "gender", "birthDate", "renewed", "updatedAt", "updatedBy", "createdAt"})
     private StudentDTO student;
     private EventsDTO event;
+    @JsonFormat(pattern = "dd-MM-yyyy HH-mm")
     private Date createdAt;
 }

@@ -22,4 +22,5 @@ public class StudentHistoryDTO {
     private Date createdAt;
     @JsonIgnoreProperties(value = {"middleName", "jmbg", "gender", "birthDate", "status", "updatedAt", "updatedBy", "createdAt"})
     private EmployeeDTO createdBy;
+    private Boolean budget;
 }

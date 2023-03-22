@@ -62,4 +62,11 @@ public class StudentHistory {
             referencedColumnName = "id"
     )
     private Employee createdBy;
+    @Column(
+            name = "budget",
+            nullable = false
+    )
+    private Boolean budget;
+
+
 }

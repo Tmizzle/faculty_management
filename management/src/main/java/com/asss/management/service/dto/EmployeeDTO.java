@@ -2,7 +2,7 @@ package com.asss.management.service.dto;
 
 import com.asss.management.entity.Employee;
 import com.asss.management.entity.Enums.*;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +12,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class EmployeeDTO {
 
     private Integer id;
@@ -27,7 +28,9 @@ public class EmployeeDTO {
     private Employee_status status;
     @JsonFormat(pattern = "dd-MM-yyyy HH-mm")
     private Date updatedAt;
-    private Integer updatedBy;
+    @JsonIdentityReference(alwaysAsId = true)
+    @JsonIgnoreProperties(value = {"accountNonLocked", "enabled", "accountNonExpired", "credentialsNonExpired", "username", "authorities", "middleName", "jmbg", "gender", "birthDate", "password", "oldPassword", "status", "updatedAt", "updatedBy", "createdAt"})
+    private Employee updatedBy;
     @JsonFormat(pattern = "dd-MM-yyyy HH-mm")
     private Date createdAt;
 }

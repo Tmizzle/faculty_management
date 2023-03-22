@@ -4,6 +4,7 @@ import com.asss.management.dao.EmployeeRepo;
 import com.asss.management.dao.StudentRepo;
 import com.asss.management.entity.Employee;
 import com.asss.management.entity.Student;
+import com.asss.management.securityConfig.JwtService;
 import com.asss.management.service.dto.EmployeeDTO;
 import com.asss.management.service.dto.StudentDTO;
 import com.asss.management.service.mapper.StudentMapper;
@@ -31,6 +32,7 @@ public class StudentService {
     private final StudentRepo studentRepo;
     private final StudentMapper studentMapper;
     private final EmployeeRepo employeeRepo;
+    private final JwtService jwtService;
 
     private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
@@ -53,9 +55,8 @@ public class StudentService {
     }
 
     public StudentDTO getUserInfoFromToken(String token) {
-        Claims claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
-        Integer userId = claims.get("id", Integer.class);
-        Student student = studentRepo.findById(userId).orElse(null);
+        String userEmail = jwtService.extractUsername(token);
+        Student student = studentRepo.findByEmail(userEmail);
         StudentDTO studentDTO = studentMapper.entityToDTO(student);
         return studentDTO;
     }
@@ -63,10 +64,9 @@ public class StudentService {
     // add new student
     public void addNewStudent(Student student, String token) {
 
-        Claims claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
-        Integer userId = claims.get("id", Integer.class);
+        String userEmail = jwtService.extractUsername(token);
 
-        Employee employee = employeeRepo.findById(userId).orElse(null);
+        Employee employee = employeeRepo.findByEmail(userEmail);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         Date currentDate = java.util.Date.from(currentDateTime.atZone(ZoneId.systemDefault()).toInstant());
@@ -96,8 +96,9 @@ public class StudentService {
         LocalDateTime currentDateTime = LocalDateTime.now();
         Date currentDate = java.util.Date.from(currentDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
-        Claims claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
-        Integer userId = claims.get("id", Integer.class);
+        String userEmail = jwtService.extractUsername(token);
+
+        Employee employee = employeeRepo.findByEmail(userEmail);
 
         Student student = studentRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Specified student has not been found."));
@@ -105,17 +106,17 @@ public class StudentService {
         if (firstName != null && !Objects.equals(student.getFirstName(), firstName)) {
             student.setFirstName(firstName);
             student.setUpdatedAt(currentDate);
-            student.setUpdatedBy(userId);
+            student.setUpdatedBy(employee);
         }
         if (lastName != null && !Objects.equals(student.getLastName(), lastName)) {
             student.setLastName(lastName);
             student.setUpdatedAt(currentDate);
-            student.setUpdatedBy(userId);
+            student.setUpdatedBy(employee);
         }
         if (middleName != null && !Objects.equals(student.getMiddleName(), middleName)) {
             student.setMiddleName(middleName);
             student.setUpdatedAt(currentDate);
-            student.setUpdatedBy(userId);
+            student.setUpdatedBy(employee);
         }
         if (email != null && !Objects.equals(student.getEmail(), email)) {
             Student emailCheck = studentRepo.findByEmail(email);
@@ -124,7 +125,7 @@ public class StudentService {
             }
             student.setEmail(email);
             student.setUpdatedAt(currentDate);
-            student.setUpdatedBy(userId);
+            student.setUpdatedBy(employee);
         }
 
     }

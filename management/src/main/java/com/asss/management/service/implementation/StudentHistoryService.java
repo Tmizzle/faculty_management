@@ -7,10 +7,9 @@ import com.asss.management.entity.Employee;
 import com.asss.management.entity.Enums.Year_of_studies;
 import com.asss.management.entity.Student;
 import com.asss.management.entity.StudentHistory;
+import com.asss.management.securityConfig.JwtService;
 import com.asss.management.service.dto.StudentHistoryDTO;
 import com.asss.management.service.mapper.StudentHistoryMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.Data;
@@ -32,6 +31,7 @@ public class StudentHistoryService {
     private final StudentHistoryMapper studentHistoryMapper;
     private final EmployeeRepo employeeRepo;
     private final StudentRepo studentRepo;
+    private final JwtService jwtService;
 
     private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
@@ -55,15 +55,20 @@ public class StudentHistoryService {
         return studentHistoryDTOList;
     }
 
+    public List<StudentHistoryDTO> getStudentHistoryByLoggedUser(String token) {
+        String userEmail = jwtService.extractUsername(token);
+        List<StudentHistory> studentHistoryList = studentHistoryRepo.studentHistoryByLoggedUser(userEmail);
+        List<StudentHistoryDTO> studentHistoryDTOList = studentHistoryMapper.entitiesToDTOs(studentHistoryList);
+        return studentHistoryDTOList;
+    }
+
     public void addNewStudentHistoryEntry(StudentHistory studentHistory, String token, String index) {
-        Claims claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
-        Integer userId = claims.get("id", Integer.class);
+        String userEmail = jwtService.extractUsername(token);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         Date currentDate = java.util.Date.from(currentDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
-        Employee createdBy = employeeRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Specified employee has not been found."));
+        Employee createdBy = employeeRepo.findByEmail(userEmail);
         Student student = studentRepo.findByIndex(index);
         if(student == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Specified student has not been found");
@@ -87,8 +92,9 @@ public class StudentHistoryService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Students needs to finish all years previous to this one");
             }
         }
+        student.setBudget(studentHistory.getBudget());
         student.setUpdatedAt(currentDate);
-        student.setUpdatedBy(createdBy.getId());
+        student.setUpdatedBy(createdBy);
         student.setYearOfStudies(studentHistory.getYearOfStudies());
         studentHistory.setStudent(student);
         studentHistory.setCreatedAt(currentDate);

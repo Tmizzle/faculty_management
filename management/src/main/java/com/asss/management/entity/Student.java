@@ -119,20 +119,26 @@ public class Student {
             nullable = false
     )
     private Date updatedAt;
-    @Column(
+    @OneToOne(targetEntity = Employee.class)
+    @JoinColumn(
             name = "updated_by",
-            nullable = false
+            referencedColumnName = "id"
     )
-    private Integer updatedBy;
+    private Employee updatedBy;
     @Column(
             name = "created_at",
             nullable = false
     )
     private Date createdAt;
-    @OneToOne(targetEntity = Employee.class, cascade = CascadeType.ALL)
+    @OneToOne(targetEntity = Employee.class)
     @JoinColumn(
             name = "created_by",
             referencedColumnName = "id"
     )
     private Employee createdBy;
+    @Column(
+            name = "budget",
+            nullable = false
+    )
+    private Boolean budget;
 }

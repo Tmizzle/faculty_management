@@ -14,8 +14,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
@@ -42,7 +44,7 @@ public class EmployeeController {
     }
 
     @GetMapping(path = "/getEmployeeByEmail/")
-    public EmployeeDTO getEmployeeByEmail(@RequestParam String token){
+    public EmployeeDTO getEmployeeByEmail(@RequestParam String token, HttpServletResponse response){
         return employeeService.getUserInfoFromToken(token);
     }
 

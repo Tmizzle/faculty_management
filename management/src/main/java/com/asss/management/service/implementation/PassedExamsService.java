@@ -31,6 +31,7 @@ public class PassedExamsService {
     private final EventsRepo eventsRepo;
     private final StudentRepo studentRepo;
     private final SubjectsRepo subjectsRepo;
+    private final ExamsRepo examsRepo;
     private final JwtService jwtService;
 
     private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
@@ -74,15 +75,20 @@ public class PassedExamsService {
         }
     }
 
-    public void addNewPassedExam(PassedExams passedExams, Integer studentID, Integer profesorID, Integer subjectID, Integer eventID) {
+    public void addNewPassedExam(PassedExams passedExams, String index, Integer profesorID, Integer subjectID, Integer eventID) {
         Employee employee = employeeRepo.findById(profesorID).orElse(null);
         Events events = eventsRepo.findById(eventID).orElse(null);
-        Student student = studentRepo.findById(studentID).orElse(null);
+        Student student = studentRepo.findByIndex(index);
         Subjects subject = subjectsRepo.findById(subjectID).orElse(null);
 
-        PassedExams passedExamCheck = passedExamsRepo.checkIfExamAlreadyPassed(subjectID, studentID);
+        Exams reportedExam = examsRepo.findIfStudentRegistratedTheExam(subjectID, eventID, index);
+        if(reportedExam == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Student never registered for that exam for that event");
+        }
 
-        if(events.getType() != Type_of_event.EXAM_PERIOD && events.getType() != Type_of_event.EXTRA_EXAM_PERIOD){
+        PassedExams passedExamCheck = passedExamsRepo.checkIfExamAlreadyPassed(subjectID, index);
+
+        if(events.getType() != Type_of_event.EXAM_REGISTRATION && events.getType() != Type_of_event.EXAM_REGISTRATION_LATE){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are trying to add passed exam for a non Exam period event");
         }
         if(passedExamCheck != null){
@@ -91,6 +97,9 @@ public class PassedExamsService {
 
         if(subject.getCourse() != student.getCourseOfStudies()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong input");
+        }
+        if(passedExams.getGrade() < 6 || passedExams.getGrade() > 10){
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Grade scope exceeded");
         }
         passedExams.setEvent(events);
         passedExams.setProfesor(employee);
@@ -100,18 +109,22 @@ public class PassedExamsService {
         passedExamsRepo.save(passedExams);
     }
 
-    public void addNewPassedExamAsProfesor(PassedExams passedExams, Integer studentID, Integer subjectID, Integer eventID, String token) {
-        Claims claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
-        Integer userId = claims.get("id", Integer.class);
+    public void addNewPassedExamAsProfesor(PassedExams passedExams, String index, Integer subjectID, Integer eventID, String token) {
+        String userEmail = jwtService.extractUsername(token);
 
-        Employee employee = employeeRepo.findById(userId).orElse(null);
+        Employee employee = employeeRepo.findByEmail(userEmail);
         Events events = eventsRepo.findById(eventID).orElse(null);
-        Student student = studentRepo.findById(studentID).orElse(null);
+        Student student = studentRepo.findByIndex(index);
         Subjects subject = subjectsRepo.findById(subjectID).orElse(null);
 
-        PassedExams passedExamCheck = passedExamsRepo.checkIfExamAlreadyPassed(subjectID, studentID);
+        Exams reportedExam = examsRepo.findIfStudentRegistratedTheExam(subjectID, eventID, index);
+        if(reportedExam == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Student never registered for that exam for that event");
+        }
 
-        if(events.getType() != Type_of_event.EXAM_PERIOD && events.getType() != Type_of_event.EXTRA_EXAM_PERIOD){
+        PassedExams passedExamCheck = passedExamsRepo.checkIfExamAlreadyPassed(subjectID, index);
+
+        if(events.getType() != Type_of_event.EXAM_REGISTRATION && events.getType() != Type_of_event.EXAM_REGISTRATION_LATE){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are trying to add passed exam for a non Exam period event");
         }
         if(passedExamCheck != null){
@@ -120,6 +133,9 @@ public class PassedExamsService {
 
         if(subject.getCourse() != student.getCourseOfStudies()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong input");
+        }
+        if(passedExams.getGrade() < 6 || passedExams.getGrade() > 10){
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Grade scope exceeded");
         }
         passedExams.setEvent(events);
         passedExams.setProfesor(employee);

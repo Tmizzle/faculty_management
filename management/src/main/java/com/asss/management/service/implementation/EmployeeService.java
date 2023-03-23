@@ -60,7 +60,6 @@ public class EmployeeService {
 
         String userEmail = jwtService.extractUsername(token);
 
-
         Employee employee = employeeRepo.findByEmail(userEmail);
 
         if (employee == null){

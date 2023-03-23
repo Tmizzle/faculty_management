@@ -55,10 +55,10 @@ public class PassedExamsController {
     @PostMapping
     public ResponseEntity addNewPassedExam(@RequestBody PassedExams passedExams,
                                         @RequestParam Integer eventID,
-                                        @RequestParam Integer studentID,
+                                        @RequestParam String index,
                                         @RequestParam Integer subjectID,
                                         @RequestParam Integer profesorID){
-        passedExamsService.addNewPassedExam(passedExams, studentID, profesorID, subjectID, eventID);
+        passedExamsService.addNewPassedExam(passedExams, index, profesorID, subjectID, eventID);
 
         return ResponseEntity.ok("Added a new passed exam successfully");
     }
@@ -66,10 +66,10 @@ public class PassedExamsController {
     @PostMapping(path = "/addNewPassedExamAsProfesor/")
     public ResponseEntity addNewPassedExamAsProfesor(@RequestBody PassedExams passedExams,
                                         @RequestParam Integer eventID,
-                                        @RequestParam Integer studentID,
+                                        @RequestParam String index,
                                         @RequestParam Integer subjectID,
                                         @RequestParam String token){
-        passedExamsService.addNewPassedExamAsProfesor(passedExams, studentID, subjectID, eventID, token);
+        passedExamsService.addNewPassedExamAsProfesor(passedExams, index, subjectID, eventID, token);
 
         return ResponseEntity.ok("Added a new passed exam successfully");
     }

@@ -1,6 +1,7 @@
 package com.asss.management.service.dto;
 
 import com.asss.management.entity.Enums.Type_of_event;
+import com.asss.management.entity.Events;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,4 +21,5 @@ public class EventsDTO {
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date endDate;
     private Type_of_event type;
+    private Events idExamPeriod;
 }

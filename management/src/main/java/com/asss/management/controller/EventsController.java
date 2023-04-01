@@ -33,8 +33,8 @@ public class EventsController {
     }
 
     @PostMapping
-    public ResponseEntity addNewEvent(@RequestBody Events event){
-        eventsService.addNewEvent(event);
+    public ResponseEntity addNewEvent(@RequestBody Events event, @RequestParam(required = false) Integer examPeriodEventID){
+        eventsService.addNewEvent(event, examPeriodEventID);
 
         return ResponseEntity.ok("Added a new event successfully");
     }
@@ -56,5 +56,14 @@ public class EventsController {
         eventsService.deleteEvent(eventID);
 
         return ResponseEntity.ok("Event successfully removed from that project");
+    }
+    @PostMapping(path = "/defineSemesters/")
+    public ResponseEntity defineSemesters(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date firstSemStartDate,
+                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date firstSemEndDate,
+                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date secondSemStartDate,
+                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date secondSemEndDate){
+        eventsService.defineSemesters(firstSemStartDate, firstSemEndDate, secondSemStartDate, secondSemEndDate);
+
+        return ResponseEntity.ok("Defined semesters successfully");
     }
 }

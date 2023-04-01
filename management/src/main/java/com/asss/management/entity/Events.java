@@ -61,4 +61,10 @@ public class Events {
     @Column(columnDefinition = "type")
     @Type( type = "pgsql_enum" )
     private Type_of_event type;
+
+    @OneToOne
+    @JoinColumn(
+            name = "id_exam_period"
+    )
+    private Events idExamPeriod;
 }

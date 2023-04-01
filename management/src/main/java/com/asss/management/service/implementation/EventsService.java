@@ -47,8 +47,14 @@ public class EventsService {
         return eventsDTO;
     }
 
-    public void addNewEvent(Events event) {
+    public void addNewEvent(Events event, Integer examPeriodEventID) {
         List<Events> eventsListCheck = eventsRepo.eventOverlapCheck(event.getEndDate(), event.getStartDate());
+        Events examPeriodEvent = new Events();
+        if(examPeriodEventID != null) {
+            examPeriodEvent = eventsRepo.findById(examPeriodEventID).orElse(null);
+        }
+        else examPeriodEvent = null;
+        System.out.println(examPeriodEvent);
 
         Date startDate = event.getStartDate();
         Date endDate = event.getEndDate();
@@ -77,6 +83,7 @@ public class EventsService {
         if (event.getType() == Type_of_event.EXTRA_EXAM_PERIOD && days > 7) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Extra exam periods can't be longer then 7 days");
         }
+        event.setIdExamPeriod(examPeriodEvent);
         eventsRepo.save(event);
 
         if (event.getType() == Type_of_event.EXAM_REGISTRATION) {
@@ -91,6 +98,7 @@ public class EventsService {
             extraEvent.setStartDate(extraStartDateAsDate);
             extraEvent.setEndDate(extraEndDateAsDate);
 
+            extraEvent.setIdExamPeriod(examPeriodEvent);
             eventsRepo.save(extraEvent);
         }
     }

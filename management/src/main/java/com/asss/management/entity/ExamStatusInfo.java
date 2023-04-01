@@ -1,15 +1,18 @@
 package com.asss.management.entity;
 
+import com.asss.management.entity.Enums.Exam_status;
 import com.asss.management.entity.Enums.PgSQLEnumType;
+import com.asss.management.entity.Enums.Student_status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "passed_exams")
+@Table(name = "exam_status_info")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,17 +20,17 @@ import javax.persistence.*;
         name = "pgsql_enum",
         typeClass = PgSQLEnumType.class
 )
-public class PassedExams {
+public class ExamStatusInfo {
 
     @Id
     @SequenceGenerator(
-            name = "new_event_sequence",
-            sequenceName = "new_event_sequence",
+            name = "new_exam_status_sequence",
+            sequenceName = "new_exam_status_sequence",
             allocationSize = 1
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "new_event_sequence"
+            generator = "new_exam_status_sequence"
     )
     @Column(
             updatable = false,
@@ -50,8 +53,7 @@ public class PassedExams {
     private Subjects subject;
 
     @Column(
-            name = "grade",
-            nullable = false
+            name = "grade"
     )
     private Integer grade;
 
@@ -69,5 +71,28 @@ public class PassedExams {
     )
     private Events event;
 
+    @Column(
+            name = "colloquium_one"
+    )
+    private Integer colloquiumOne;
+    @Column(
+            name = "colloquium_two"
+    )
+    private Integer colloquiumTwo;
+
+    @Column(
+            name = "colloquium_three"
+    )
+    private Integer colloquiumThree;
+
+    @Column(
+            name = "exam_points"
+    )
+    private Integer examPoints;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "status")
+    @Type( type = "pgsql_enum" )
+    private Exam_status status;
 
 }

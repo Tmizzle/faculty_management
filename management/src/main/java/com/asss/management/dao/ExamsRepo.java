@@ -1,11 +1,13 @@
 package com.asss.management.dao;
 
 import com.asss.management.entity.AssignedProfesors;
+import com.asss.management.entity.Events;
 import com.asss.management.entity.Exams;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -26,4 +28,6 @@ public interface ExamsRepo extends JpaRepository<Exams, Integer> {
     @Query("SELECT e FROM Exams e WHERE e.subject.id= ?1 AND e.event.id= ?2")
     List<Exams> findBySubjectForEvent(Integer subjectID, Integer eventID);
 
+    @Query("SELECT e FROM Exams e WHERE e.subject.id= ?1 AND e.student.email= ?2 AND ?3 BETWEEN e.event.startDate AND e.event.endDate")
+    Exams checkIfExamAlreadyRegisteredForEventOngoing(Integer subjectID, String stundetEmail, Date currentTime);
 }

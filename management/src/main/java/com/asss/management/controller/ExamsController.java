@@ -1,12 +1,10 @@
 package com.asss.management.controller;
 
-import com.asss.management.service.dto.EventsDTO;
 import com.asss.management.service.dto.ExamsDTO;
-import com.asss.management.service.dto.PassedExamsDTO;
-import com.asss.management.service.dto.StudentHistoryDTO;
 import com.asss.management.service.implementation.ExamsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,5 +48,14 @@ public class ExamsController {
     @GetMapping(path = "/getExamsBySubjectForEvent/")
     public List<ExamsDTO> getExamsBySubjectForEvent(@RequestParam Integer subjectID, @RequestParam Integer eventID){
         return examsService.getBySubjectForEvent(subjectID, eventID);
+    }
+
+    @PostMapping
+    public ResponseEntity addNewExam(@RequestParam String token,
+                                     @RequestParam Integer profesorID,
+                                     @RequestParam Integer subjectID){
+        examsService.addNewExam(token, profesorID, subjectID);
+
+        return ResponseEntity.ok("Added a new exam registration successfully");
     }
 }

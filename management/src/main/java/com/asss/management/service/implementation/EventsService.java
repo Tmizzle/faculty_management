@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -198,5 +199,38 @@ public class EventsService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can't delete an ongoing event");
         }
         eventsRepo.delete(event);
+    }
+    public void defineSemesters(Date firstSemStartDate, Date firstSemEndDate, Date secondSemStartDate, Date secondSemEndDate){
+        Events firstSem = new Events();
+        Events secondSem = new Events();
+        int currentYear = Year.now().getValue();
+        int nextYear = currentYear + 1;
+        LocalDate firstSemEndLocalDate = firstSemEndDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+        LocalDate secondSemStartLocalDate = secondSemStartDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        List<Events> semesterOverlapCheck = eventsRepo.checkForSemesterOverlap(firstSemEndDate);
+        if(semesterOverlapCheck != null){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Semester overlap");
+        }
+        if (secondSemStartLocalDate.isBefore(firstSemEndLocalDate)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Semester overlaps");
+        }
+
+        firstSem.setStartDate(firstSemStartDate);
+        firstSem.setEndDate(firstSemEndDate);
+        firstSem.setType(Type_of_event.FIRST_SEMESTER);
+        firstSem.setName("FirstSemestar " + currentYear);
+
+        secondSem.setStartDate(secondSemStartDate);
+        secondSem.setEndDate(secondSemEndDate);
+        secondSem.setType(Type_of_event.SECOND_SEMESTER);
+        secondSem.setName("SecondSemestar " + nextYear);
+
+        eventsRepo.save(firstSem);
+        eventsRepo.save(secondSem);
     }
 }

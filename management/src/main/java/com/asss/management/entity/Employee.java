@@ -4,6 +4,7 @@ import com.asss.management.entity.Enums.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -102,10 +104,9 @@ public class Employee implements UserDetails {
             name = "updated_at"
     )
     private Date updatedAt;
-    @OneToOne(targetEntity = Employee.class)
+    @OneToOne
     @JoinColumn(
-            name = "updated_by",
-            referencedColumnName = "id"
+            name = "updated_by"
     )
     private Employee updatedBy;
     @Column(

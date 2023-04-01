@@ -2,9 +2,10 @@ package com.asss.management.service.implementation;
 
 import com.asss.management.dao.*;
 import com.asss.management.entity.*;
+import com.asss.management.entity.Enums.Currency;
+import com.asss.management.entity.Enums.Finances_status;
 import com.asss.management.entity.Enums.Type_of_event;
 import com.asss.management.securityConfig.JwtService;
-import com.asss.management.service.dto.EventsDTO;
 import com.asss.management.service.dto.ExamsDTO;
 import com.asss.management.service.mapper.ExamsMapper;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class ExamsService {
     private final StudentRepo studentRepo;
     private final EmployeeRepo employeeRepo;
     private final SubjectsRepo subjectsRepo;
+    private final FinancesRepo financesRepo;
 
     // Retrieves all exams registered
     public List<ExamsDTO> getExams() {
@@ -97,12 +99,56 @@ public class ExamsService {
         if(checksIfAlreadyRegistered != null){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Already registered for that exam in this exam period");
         }
-
         exam.setSubject(subject);
         exam.setCreatedAt(currentDate);
         exam.setStudent(student);
         exam.setProfesor(profesor);
         exam.setEvent(ongoingEvent);
         examsRepo.save(exam);
+
+        List<Exams> examsList = examsRepo.findHowManyTimesDidStudentRegisterAnExam(subjectID, userEmail);
+
+        if(ongoingEvent.getType() == Type_of_event.EXAM_REGISTRATION_LATE){
+            Finances finances = new Finances();
+            Finances financesRegular = new Finances();
+
+            finances.setStudent(student);
+            finances.setAmount(800);
+            finances.setCreatedAt(currentDate);
+            finances.setIdExam(exam);
+            finances.setCurrency(Currency.RSD);
+            finances.setNote("Late exam registration fee");
+            finances.setStatus(Finances_status.ACTIVE);
+
+            financesRegular.setStudent(student);
+            if(examsList.size() < 3){
+                financesRegular.setAmount(300);
+            }
+            else financesRegular.setAmount(1500);
+            financesRegular.setCreatedAt(currentDate);
+            financesRegular.setIdExam(exam);
+            financesRegular.setCurrency(Currency.RSD);
+            financesRegular.setNote("Regular exam registration fee");
+            financesRegular.setStatus(Finances_status.ACTIVE);
+
+            financesRepo.save(financesRegular);
+            financesRepo.save(finances);
+        }
+        else if(ongoingEvent.getType() == Type_of_event.EXAM_REGISTRATION){
+            Finances financesRegular = new Finances();
+
+            financesRegular.setStudent(student);
+            if(examsList.size() < 3){
+                financesRegular.setAmount(300);
+            }
+            else financesRegular.setAmount(1500);
+            financesRegular.setCreatedAt(currentDate);
+            financesRegular.setIdExam(exam);
+            financesRegular.setCurrency(Currency.RSD);
+            financesRegular.setNote("Regular exam registration fee");
+            financesRegular.setStatus(Finances_status.ACTIVE);
+
+            financesRepo.save(financesRegular);
+        }
     }
 }

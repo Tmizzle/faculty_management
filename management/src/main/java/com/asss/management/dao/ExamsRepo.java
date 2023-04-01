@@ -30,4 +30,7 @@ public interface ExamsRepo extends JpaRepository<Exams, Integer> {
 
     @Query("SELECT e FROM Exams e WHERE e.subject.id= ?1 AND e.student.email= ?2 AND ?3 BETWEEN e.event.startDate AND e.event.endDate")
     Exams checkIfExamAlreadyRegisteredForEventOngoing(Integer subjectID, String stundetEmail, Date currentTime);
+
+    @Query("SELECT e FROM Exams e WHERE e.subject.id= ?1 AND e.student.email= ?2")
+    List<Exams> findHowManyTimesDidStudentRegisterAnExam(Integer subjectID, String studentEmail);
 }

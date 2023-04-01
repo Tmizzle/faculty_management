@@ -1,12 +1,12 @@
 package com.asss.management.service.implementation;
 
-import com.asss.management.dao.EmployeeRepo;
-import com.asss.management.dao.StudentRepo;
-import com.asss.management.entity.Employee;
-import com.asss.management.entity.Student;
+import com.asss.management.dao.*;
+import com.asss.management.entity.*;
+import com.asss.management.entity.Enums.*;
 import com.asss.management.securityConfig.JwtService;
 import com.asss.management.service.dto.EmployeeDTO;
 import com.asss.management.service.dto.StudentDTO;
+import com.asss.management.service.dto.SubjectsDTO;
 import com.asss.management.service.mapper.StudentMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -33,6 +33,10 @@ public class StudentService {
     private final StudentMapper studentMapper;
     private final EmployeeRepo employeeRepo;
     private final JwtService jwtService;
+    private final SubjectsRepo subjectsRepo;
+    private final ExamStatusInfoRepo examStatusInfoRepo;
+    private final StudentHistoryRepo studentHistoryRepo;
+    private final FinancesRepo financesRepo;
 
     private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
@@ -82,7 +86,65 @@ public class StudentService {
         }
         student.setCreatedAt(currentDate);
         student.setCreatedBy(employee);
+        student.setYearOfStudies(Year_of_studies.FIRST_YEAR);
+        student.setRenewed(false);
+        student.setStatus(Student_status.ACTIVE);
+        student.setOldPassword(null);
+        student.setUpdatedAt(null);
+        student.setUpdatedBy(null);
         studentRepo.save(student);
+
+        StudentHistory studentHistory = new StudentHistory();
+        studentHistory.setStudent(student);
+        studentHistory.setCreatedAt(currentDate);
+        studentHistory.setCreatedBy(employee);
+        studentHistory.setYearOfStudies(Year_of_studies.FIRST_YEAR);
+        studentHistory.setBudget(student.getBudget());
+
+        studentHistoryRepo.save(studentHistory);
+
+        if(!student.getBudget()){
+            Finances finances = new Finances();
+
+            finances.setStudent(student);
+            finances.setAmount(70000);
+            finances.setCreatedAt(currentDate);
+            finances.setIdExam(null);
+            finances.setCurrency(Currency.RSD);
+            finances.setNote("New year fee for non budget student");
+            finances.setStatus(Finances_status.ACTIVE);
+
+            financesRepo.save(finances);
+        }
+        Finances finances = new Finances();
+
+        finances.setStudent(student);
+        finances.setAmount(2500);
+        finances.setCreatedAt(currentDate);
+        finances.setIdExam(null);
+        finances.setCurrency(Currency.RSD);
+        finances.setNote("New year entry fee");
+        finances.setStatus(Finances_status.ACTIVE);
+        financesRepo.save(finances);
+
+        List<Subjects> subjectsList = subjectsRepo.findByYearForCourse(Year_of_studies.FIRST_YEAR, student.getCourseOfStudies());
+
+        for (Subjects subjects : subjectsList) {
+            ExamStatusInfo examStatusInfo = new ExamStatusInfo();
+            examStatusInfo.setStudent(student);
+            examStatusInfo.setStatus(Exam_status.UNPASSED);
+            examStatusInfo.setGrade(5);
+            examStatusInfo.setExamPoints(0);
+            examStatusInfo.setProfesor(null);
+            examStatusInfo.setColloquiumThree(0);
+            examStatusInfo.setColloquiumOne(0);
+            examStatusInfo.setColloquiumTwo(0);
+            examStatusInfo.setSubject(subjects);
+            examStatusInfo.setEvent(null);
+
+            examStatusInfoRepo.save(examStatusInfo);
+        }
+
     }
 
     // Updated student

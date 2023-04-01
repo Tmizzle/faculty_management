@@ -81,9 +81,6 @@ public class ExamsService {
         if(ongoingEvent == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No exam registration period active at the moment");
         }
-        if(ongoingEvent.getType() != Type_of_event.EXAM_REGISTRATION && ongoingEvent.getType() != Type_of_event.EXAM_REGISTRATION_LATE){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current active event is not exam registration type");
-        }
         String userEmail = jwtService.extractUsername(token);
 
         Student student = studentRepo.findByEmail(userEmail);

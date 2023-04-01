@@ -21,5 +21,5 @@ public class FinancesDTO {
     private double amount;
     private Finances_status status;
     private Date createdAt;
-    private Exams idExam;
+    private ExamsDTO idExam;
 }

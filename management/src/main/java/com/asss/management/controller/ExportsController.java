@@ -1,7 +1,10 @@
 package com.asss.management.controller;
 
+import com.asss.management.dao.ExamStatusInfoRepo;
 import com.asss.management.dao.ExamsRepo;
+import com.asss.management.entity.ExamStatusInfo;
 import com.asss.management.entity.Exams;
+import com.asss.management.securityConfig.JwtService;
 import com.asss.management.service.implementation.ExportsService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +25,8 @@ public class ExportsController {
 
     private final ExportsService exportsService;
     private final ExamsRepo examsRepo;
+    private final ExamStatusInfoRepo examStatusInfoRepo;
+    private final JwtService jwtService;
 
     @GetMapping("/download-exam-report-per-event")
     public ResponseEntity downloadClientReport(HttpServletResponse response,
@@ -34,6 +39,24 @@ public class ExportsController {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         exportsService.exportClientHours(dataList, fileName, token, eventID);
+
+        return ResponseEntity.ok("Successfully generated your file");
+    }
+
+    @GetMapping("/download-student-exam-info")
+    public ResponseEntity downloadStudentExamInfo(HttpServletResponse response,
+                                               @Parameter(description = "Session token", required = true)
+                                               @RequestParam String token,
+                                               @RequestParam boolean all,
+                                                  @RequestParam boolean passed,
+                                                  @RequestParam boolean unpassed) throws IOException {
+        String userEmail = jwtService.extractUsername(token);
+        List<ExamStatusInfo> passedExams = examStatusInfoRepo.passedExamsByStudent(userEmail);
+        List<ExamStatusInfo> unpassedExams = examStatusInfoRepo.unpassedExamsByStudent(userEmail);
+        String fileName = "Student Exam Report.xlsx";
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        exportsService.exportExamInfoForStudent(passedExams, unpassedExams, fileName, token, all, passed, unpassed);
 
         return ResponseEntity.ok("Successfully generated your file");
     }

@@ -58,4 +58,13 @@ public class ExamsController {
 
         return ResponseEntity.ok("Added a new exam registration successfully");
     }
+
+    @DeleteMapping(path = "/removeExam/")
+    public ResponseEntity removeExam(@RequestParam String token,
+                                     @RequestParam Integer eventID,
+                                     @RequestParam Integer subjectID){
+        examsService.removeExam(token, eventID, subjectID);
+
+        return ResponseEntity.ok("Removed an exam successfully");
+    }
 }

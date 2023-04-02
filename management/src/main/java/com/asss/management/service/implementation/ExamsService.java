@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -147,5 +148,34 @@ public class ExamsService {
 
             financesRepo.save(financesRegular);
         }
+    }
+    public void removeExam(String token, Integer eventID, Integer subjectID){
+        String userEmail = jwtService.extractUsername(token);
+
+        Exams exam = examsRepo.findIfEntryExists(subjectID, eventID, userEmail);
+
+        Events examPeriod = eventsRepo.findById(eventID).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
+
+        Date examPeriodStart = examPeriod.getStartDate();
+        LocalDate localExamPeriodStart = examPeriodStart.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        Date currentDate = java.util.Date.from(currentDateTime.atZone(ZoneId.systemDefault()).toInstant());
+
+        LocalDateTime localExamPeriodStartDateTime = localExamPeriodStart.atStartOfDay();
+        boolean isAfterExamPeriodStart = currentDateTime.isAfter(localExamPeriodStartDateTime);
+
+        if (isAfterExamPeriodStart) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Exam period has already started, can't cancel now");
+        }
+
+        List<Finances> finances = financesRepo.financesForSpecificExamEntry(userEmail, exam.getId());
+
+        for (Finances financesDelete : finances) {
+            financesRepo.delete(financesDelete);
+        }
+        examsRepo.delete(exam);
     }
 }

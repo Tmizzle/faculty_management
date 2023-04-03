@@ -2,6 +2,7 @@ package com.asss.management.service.implementation;
 
 import com.asss.management.dao.EmployeeRepo;
 import com.asss.management.entity.Employee;
+import com.asss.management.entity.Enums.Employee_category;
 import com.asss.management.securityConfig.JwtService;
 import com.asss.management.service.dto.EmployeeDTO;
 import com.asss.management.service.mapper.EmployeeMapper;
@@ -38,15 +39,18 @@ public class EmployeeService {
     // Retrieves all employees
     public List<EmployeeDTO> getEmployee() {
         List<Employee> employeeList = employeeRepo.findAll();
-        List<EmployeeDTO> employeeDTOList = employeeMapper.entitiesToDTOs(employeeList);
-        return employeeDTOList;
+        return employeeMapper.entitiesToDTOs(employeeList);
     }
 
     public EmployeeDTO getUserInfoFromToken(String token) {
         String userEmail = jwtService.extractUsername(token);
         Employee employee = employeeRepo.findByEmail(userEmail);
-        EmployeeDTO employeeDTO = employeeMapper.entityToDTO(employee);
-        return employeeDTO;
+        return employeeMapper.entityToDTO(employee);
+    }
+
+    public List<EmployeeDTO> getProfessors() {
+        List<Employee> employeeList = employeeRepo.findProfessors(Employee_category.PROFESOR);
+        return employeeMapper.entitiesToDTOs(employeeList);
     }
 
     @Transactional

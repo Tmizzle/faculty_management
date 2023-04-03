@@ -64,6 +64,13 @@ public class ExamStatusInfoService {
         return examStatusInfoDTOList;
     }
 
+    public List<ExamStatusInfoDTO> getUnpassedExamsByStudent(String token) {
+        String userEmail = jwtService.extractUsername(token);
+        List<ExamStatusInfo> examStatusInfoList = examStatusInfoRepo.unpassedExamsByStudent(userEmail);
+        List<ExamStatusInfoDTO> examStatusInfoDTOList = examStatusInfoMapper.entitiesToDTOs(examStatusInfoList);
+        return examStatusInfoDTOList;
+    }
+
     @Transactional
     public void updateExamInfo(String index,
                                Integer subjectID,

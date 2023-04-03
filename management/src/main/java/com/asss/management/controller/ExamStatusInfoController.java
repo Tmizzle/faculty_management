@@ -40,6 +40,11 @@ public class ExamStatusInfoController {
         return examStatusInfoService.getPassedExamsByStudent(token);
     }
 
+    @GetMapping(path = "/getUnpassedExamsByStudent/")
+    public List<ExamStatusInfoDTO> getUnpassedExamsByStudent(@RequestParam String token){
+        return examStatusInfoService.getUnpassedExamsByStudent(token);
+    }
+
     @PutMapping
     public ResponseEntity updateExamInfo(
             @RequestParam String index,

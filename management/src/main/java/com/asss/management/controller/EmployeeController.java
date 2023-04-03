@@ -48,6 +48,11 @@ public class EmployeeController {
         return employeeService.getUserInfoFromToken(token);
     }
 
+    @GetMapping(path = "/getProfessors/")
+    public List<EmployeeDTO> getProfessors(){
+        return employeeService.getProfessors();
+    }
+
     @PutMapping(path = "{token}")
     public ResponseEntity updateEmployee(
             @PathVariable("token") String token,

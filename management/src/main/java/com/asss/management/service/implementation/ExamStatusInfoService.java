@@ -3,7 +3,6 @@ package com.asss.management.service.implementation;
 import com.asss.management.dao.*;
 import com.asss.management.entity.*;
 import com.asss.management.entity.Enums.Exam_status;
-import com.asss.management.entity.Enums.Type_of_event;
 import com.asss.management.securityConfig.JwtService;
 import com.asss.management.service.dto.ExamStatusInfoDTO;
 import com.asss.management.service.mapper.ExamStatusInfoMapper;
@@ -17,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.transaction.Transactional;
 import java.security.Key;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Data
@@ -79,6 +77,10 @@ public class ExamStatusInfoService {
                                Integer colloquiumThree
                                ){
         ExamStatusInfo examStatusInfo = examStatusInfoRepo.findExamInfoForSubject(subjectID, index);
+
+        if(examStatusInfo.getStatus() == Exam_status.PASSED){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Exam was already marked as passed");
+        }
         if(examStatusInfo == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
         }
@@ -139,9 +141,6 @@ public class ExamStatusInfoService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Student never registered for that exam for that event");
         }
 
-        if(events.getType() != Type_of_event.EXAM_REGISTRATION && events.getType() != Type_of_event.EXAM_REGISTRATION_LATE){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are trying to add passed exam for a non Exam period event");
-        }
         int totalColloquiumPoints = examStatusInfo.getColloquiumOne() + examStatusInfo.getColloquiumTwo() + examStatusInfo.getColloquiumThree();
         if(totalColloquiumPoints < 26){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Student doesn't have enough points via colloquiums");

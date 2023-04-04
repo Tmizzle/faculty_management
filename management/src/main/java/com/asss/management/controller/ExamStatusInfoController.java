@@ -27,7 +27,7 @@ public class ExamStatusInfoController {
 
     @GetMapping(path = "{id}")
     public ExamStatusInfoDTO getPassedExamById(@PathVariable("id") Integer id){
-        return examStatusInfoService.getPassedExamById(id);
+        return examStatusInfoService.getPassedExamById(id); 
     }
 
     @GetMapping(path = "/getPassedExamsByProfesor/")

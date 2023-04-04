@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 @RestController
@@ -29,18 +30,24 @@ public class ExportsController {
     private final JwtService jwtService;
 
     @GetMapping("/download-exam-report-per-event")
-    public ResponseEntity downloadClientReport(HttpServletResponse response,
-                                               @Parameter(description = "Session token", required = true)
-                                               @RequestParam String token,
-                                               @Parameter(description = "event ID", example = "10", required = true)
-                                               @RequestParam Integer eventID) throws IOException {
+    public void downloadClientReport(HttpServletResponse response,
+                                     @Parameter(description = "Session token", required = true)
+                                     @RequestParam String token,
+                                     @Parameter(description = "event ID", example = "10", required = true)
+                                     @RequestParam Integer eventID) throws IOException {
         List<Exams> dataList = examsRepo.findExamsForEventByProfesor(token, eventID);
         String fileName = "Exam Report.xlsx";
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-        exportsService.exportClientHours(dataList, fileName, token, eventID);
+        response.setHeader("Content-Transfer-Encoding", "binary");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0);
 
-        return ResponseEntity.ok("Successfully generated your file");
+        try (OutputStream out = response.getOutputStream()) {
+            exportsService.exportExamsPerEventForProfessor(dataList, fileName, token, eventID);
+            out.flush();
+        }
     }
 
     @GetMapping("/download-student-exam-info")

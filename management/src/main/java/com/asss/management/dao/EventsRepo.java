@@ -19,6 +19,11 @@ public interface EventsRepo extends JpaRepository<Events, Integer> {
     List<Events> eventOverlapCheck(Date endDate, Date startDate);
 
     @Query(value = "SELECT * FROM events " +
+            "WHERE events.type = 'EXAM_PERIOD' OR events.type = 'EXTRA_EXAM_PERIOD' ; ",
+            nativeQuery = true)
+    List<Events> getExamPeriods();
+
+    @Query(value = "SELECT * FROM events " +
             "WHERE current_date BETWEEN events.start_date AND events.end_date " +
             "AND events.type IN ('EXAM_REGISTRATION', 'EXAM_REGISTRATION_LATE') ; ",
             nativeQuery = true)

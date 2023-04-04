@@ -35,16 +35,19 @@ public class EventsService {
     // Retrieves all events
     public List<EventsDTO> getEvents() {
         List<Events> eventsList = eventsRepo.findAll();
-        List<EventsDTO> eventsDTOList = eventsMapper.entitiesToDTOs(eventsList);
-        return eventsDTOList;
+        return eventsMapper.entitiesToDTOs(eventsList);
+    }
+
+    public List<EventsDTO> getExamPeriods() {
+        List<Events> eventsList = eventsRepo.getExamPeriods();
+        return eventsMapper.entitiesToDTOs(eventsList);
     }
 
     // Retrieves a event by ID
     public EventsDTO getEventByID(Integer id) {
         Events events = eventsRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "event with id " + id + " does not exist"));
-        EventsDTO eventsDTO = eventsMapper.entityToDTO(events);
-        return eventsDTO;
+        return eventsMapper.entityToDTO(events);
     }
 
     public void addNewEvent(Events event, Integer examPeriodEventID) {

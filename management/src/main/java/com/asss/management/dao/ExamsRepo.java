@@ -17,7 +17,7 @@ public interface ExamsRepo extends JpaRepository<Exams, Integer> {
     @Query("SELECT e FROM Exams e WHERE e.event.idExamPeriod.id= ?1")
     List<Exams> findByEvent(Integer eventID);
 
-    @Query("SELECT e FROM Exams e WHERE e.subject.id= ?1 AND e.event.id= ?2 AND e.student.index = ?3")
+    @Query("SELECT e FROM Exams e WHERE e.subject.id= ?1 AND e.event.idExamPeriod.id= ?2 AND e.student.index = ?3")
     Exams findIfStudentRegistratedTheExam(Integer subjectID, Integer eventID, String index);
 
     @Query("SELECT e FROM Exams e WHERE e.subject.id= ?1 AND e.event.idExamPeriod.id= ?2 AND e.student.email = ?3")

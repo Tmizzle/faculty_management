@@ -32,7 +32,7 @@ public class ExportsService {
     private final ExamStatusInfoRepo examStatusInfoRepo;
     private final StudentRepo studentRepo;
 
-    public void exportClientHours(List<Exams> dataList, String fileName, String token, Integer eventID) throws IOException {
+    public void exportExamsPerEventForProfessor(List<Exams> dataList, String fileName, String token, Integer eventID) throws IOException {
         String userEmail = jwtService.extractUsername(token);
 
         List<Exams> examsList = examsRepo.findExamsForEventByProfesor(userEmail, eventID);

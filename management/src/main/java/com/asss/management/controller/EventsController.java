@@ -27,6 +27,11 @@ public class EventsController {
         return eventsService.getEvents();
     }
 
+    @GetMapping(path = "/examPeriods")
+    public List<EventsDTO> getExamPeriods(){
+        return eventsService.getExamPeriods();
+    }
+
     @GetMapping(path = "{id}")
     public EventsDTO getEventByID(@PathVariable("id") Integer id){
         return eventsService.getEventByID(id);

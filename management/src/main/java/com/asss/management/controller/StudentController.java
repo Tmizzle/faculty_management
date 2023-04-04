@@ -43,8 +43,8 @@ public class StudentController {
     }
 
 
-    @GetMapping(path = "/getStudentById/")
-    public StudentDTO getStudebtById(@RequestParam String token){
+    @GetMapping(path = "/getStudentByEmail/")
+    public StudentDTO getStudentByEmail(@RequestParam String token){
         return studentService.getUserInfoFromToken(token);
     }
 

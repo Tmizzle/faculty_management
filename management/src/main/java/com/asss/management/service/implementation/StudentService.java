@@ -44,8 +44,7 @@ public class StudentService {
     // Retrieves all students
     public List<StudentDTO> getStudents() {
         List<Student> studentList = studentRepo.findAll();
-        List<StudentDTO> studentDTOList = studentMapper.entitiesToDTOs(studentList);
-        return studentDTOList;
+        return studentMapper.entitiesToDTOs(studentList);
     }
 
     // Retrieves a student by index
@@ -54,15 +53,13 @@ public class StudentService {
         if(student == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student with that index doesn't exist");
         }
-        StudentDTO studentDTO = studentMapper.entityToDTO(student);
-        return studentDTO;
+        return studentMapper.entityToDTO(student);
     }
 
     public StudentDTO getUserInfoFromToken(String token) {
         String userEmail = jwtService.extractUsername(token);
         Student student = studentRepo.findByEmail(userEmail);
-        StudentDTO studentDTO = studentMapper.entityToDTO(student);
-        return studentDTO;
+        return studentMapper.entityToDTO(student);
     }
 
     // add new student
@@ -88,6 +85,7 @@ public class StudentService {
         student.setCreatedBy(employee);
         student.setYearOfStudies(Year_of_studies.FIRST_YEAR);
         student.setRenewed(false);
+        student.setTypeOfStudies(Type_of_studies.REGULAR);
         student.setStatus(Student_status.ACTIVE);
         student.setOldPassword(null);
         student.setUpdatedAt(null);

@@ -43,7 +43,7 @@ public class SubjectsController {
     public ResponseEntity addNewSubject(@RequestBody Subjects subjects){
         subjectsService.addNewSubject(subjects);
 
-        return ResponseEntity.ok("Added a new subject successfully");
+        return ResponseEntity.ok(new MyCustomResponse("Nov predmet dodat uspesno!"));
     }
     @PutMapping(path = "{id}")
     public ResponseEntity updatedSubject(
@@ -53,7 +53,7 @@ public class SubjectsController {
     ) {
         subjectsService.updateSubject(id, year, semester);
 
-        return ResponseEntity.ok("Subject updated successfully");
+        return ResponseEntity.ok(new MyCustomResponse("Informacije o predmetu promenjene uspesno!"));
     }
 
 }

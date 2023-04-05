@@ -55,7 +55,7 @@ public class ExamStatusInfoController {
     ) {
         examStatusInfoService.updateExamInfo(index, subjectID, colloquiumOne, colloquiumTwo, colloquiumThree);
 
-        return ResponseEntity.ok("Colloquium Points for that exam added successfully");
+        return ResponseEntity.ok(new MyCustomResponse("Uspesno promenjeni poeni za predispitne obaveze!"));
     }
 
     @PutMapping(path = "/passedExam/{token}")
@@ -68,6 +68,6 @@ public class ExamStatusInfoController {
     ) {
         examStatusInfoService.updateExamAsPassed(index, subjectID, token, eventID, examPoints);
 
-        return ResponseEntity.ok("Exam updated successfully");
+        return ResponseEntity.ok(new MyCustomResponse("Uspesno promenjeno!"));
     }
 }

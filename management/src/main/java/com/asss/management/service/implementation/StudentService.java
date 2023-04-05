@@ -13,6 +13,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.Data;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,6 +25,8 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Data
@@ -75,12 +78,35 @@ public class StudentService {
         Student emailCheck = studentRepo.findByEmail(student.getEmail());
         // Internal code unique check
         if (emailCheck != null){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email se vec koristi");
         }
         Student jmbgCheck = studentRepo.findByJMBG(student.getJmbg());
         if(jmbgCheck != null){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "JMBG already in use");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "JMBG se vec koristi");
         }
+        Student indexCheck = studentRepo.findByIndex(student.getIndex());
+        if(indexCheck != null){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Index se vec koristi");
+        }
+
+        // Check that the new password meets the required format
+        Pattern passwordPattern = Pattern.compile("^(?=.*\\d)(?=.*[a-zA-Z]).{8,}$");
+        Matcher passwordMatcher = passwordPattern.matcher(student.getPassword());
+        if (!passwordMatcher.matches()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lozinka mora biti minimum 8 karaktera dugacka, mora imati najmanje 1 broj i 1 slovo");
+        }
+        // Set the old password to the current password and hash the new password
+        String hashedPassword = BCrypt.hashpw(student.getPassword(), BCrypt.gensalt());
+
+        // regular expression pattern for email validation
+        String emailRegex = "^(?!\\.)[a-zA-Z0-9._%+-]+(?!\\.|\\.{2,})[^.]@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        // check if email is valid
+        if (!pattern.matcher(student.getEmail()).matches() || student.getEmail().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email format je pogresan!");
+        }
+
+        student.setPassword(hashedPassword);
         student.setCreatedAt(currentDate);
         student.setCreatedBy(employee);
         student.setYearOfStudies(Year_of_studies.FIRST_YEAR);

@@ -153,6 +153,9 @@ public class ExamsService {
         String userEmail = jwtService.extractUsername(token);
 
         Exams exam = examsRepo.findIfEntryExists(subjectID, eventID, userEmail);
+        if(exam == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
+        }
 
         Events examPeriod = eventsRepo.findById(eventID).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
 

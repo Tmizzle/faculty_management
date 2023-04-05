@@ -25,18 +25,15 @@ public class SubjectsService {
     // Retrieves all subjects
     public List<SubjectsDTO> getSubjects() {
         List<Subjects> subjectsList = subjectsRepo.findAll();
-        List<SubjectsDTO> subjectsDTOList = subjectsMapper.entitiesToDTOs(subjectsList);
-        return subjectsDTOList;
+        return subjectsMapper.entitiesToDTOs(subjectsList);
     }
 
     public List<SubjectsDTO> getSubjectsByYear(String year){
-        List<SubjectsDTO> subjectsDTOList = subjectsRepo.findByYear(year);
-        return subjectsDTOList;
+        return subjectsRepo.findByYear(year);
     }
 
     public List<SubjectsDTO> getSubjectsBySemester(String semester){
-        List<SubjectsDTO> subjectsDTOList = subjectsRepo.findBySemester(semester);
-        return subjectsDTOList;
+        return subjectsRepo.findBySemester(semester);
     }
 
     public void addNewSubject(Subjects subjects) {
@@ -73,17 +70,17 @@ public class SubjectsService {
         if (year != null && !Objects.equals(subjects.getYear(), year) && semester == null) {
             if(year == Year_of_studies.FIRST_YEAR){
                 if(subjects.getSemester() != Semester.FIRST && subjects.getSemester() != Semester.SECOND){
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Year and semester not matching 1");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Year and semester not matching 1");
                 }
             }
             if(year == Year_of_studies.SECOND_YEAR){
                 if(subjects.getSemester() != Semester.THIRD && subjects.getSemester() != Semester.FOURTH){
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Year and semester not matching 2");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Year and semester not matching 2");
                 }
             }
             if(year == Year_of_studies.THIRD_YEAR){
                 if(subjects.getSemester() != Semester.FIFTH && subjects.getSemester() != Semester.SIXTH){
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Year and semester not matching 3");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Year and semester not matching 3");
                 }
             }
             subjects.setYear(year);
@@ -91,17 +88,17 @@ public class SubjectsService {
         if (semester != null && !Objects.equals(subjects.getSemester(), semester) && year == null) {
             if(semester != Semester.FIRST && semester != Semester.SECOND){
                 if(subjects.getYear() == Year_of_studies.FIRST_YEAR){
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Semester and year not matching 1");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Semester and year not matching 1");
                 }
             }
             if(semester != Semester.THIRD && semester != Semester.FOURTH){
                 if(subjects.getYear() == Year_of_studies.SECOND_YEAR){
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Semester and year not matching 1");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Semester and year not matching 1");
                 }
             }
             if(semester != Semester.FIFTH && semester != Semester.SIXTH){
                 if(subjects.getYear() == Year_of_studies.THIRD_YEAR){
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Semester and year not matching 1");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Semester and year not matching 1");
                 }
             }
             subjects.setSemester(semester);
@@ -109,17 +106,17 @@ public class SubjectsService {
         if(semester != null && year != null){
                 if(year == Year_of_studies.FIRST_YEAR){
                     if(semester != Semester.FIRST && semester != Semester.SECOND){
-                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Fuck");
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fuck");
                     }
                 }
                 if(year == Year_of_studies.SECOND_YEAR){
                     if(semester != Semester.THIRD && semester != Semester.FOURTH){
-                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Fuck 2");
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fuck 2");
                     }
                 }
                 if(year == Year_of_studies.THIRD_YEAR){
                     if(semester != Semester.FIFTH && semester != Semester.SIXTH){
-                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Fuck 3");
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fuck 3");
                     }
                 }
                 subjects.setYear(year);

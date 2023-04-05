@@ -78,24 +78,24 @@ public class ExamStatusInfoService {
                                ){
         ExamStatusInfo examStatusInfo = examStatusInfoRepo.findExamInfoForSubject(subjectID, index);
 
-        if(examStatusInfo.getStatus() == Exam_status.PASSED){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Exam was already marked as passed");
-        }
         if(examStatusInfo == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pogresno ste uneli podatke");
+        }
+        if(examStatusInfo.getStatus() == Exam_status.PASSED){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ispit je vec oznacen kao polozen");
         }
 
         if(colloquiumOne < 0 || colloquiumOne > 50){
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Colloquium points scope exceeded");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Maksimum poena sa kolokvijuma je 50");
         }
         if(colloquiumTwo < 0 || colloquiumTwo > 50){
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Colloquium points scope exceeded");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Maksimum poena sa kolokvijuma je 50");
         }
         if(colloquiumThree < 0 || colloquiumThree > 50){
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Colloquium points scope exceeded");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Maksimum poena sa kolokvijuma je 50");
         }
         if(colloquiumOne + colloquiumTwo + colloquiumThree > 50){
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Colloquium points scope exceeded");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Maksimum poena sa kolokvijuma je 50");
         }
 
         examStatusInfo.setColloquiumOne(colloquiumOne);
@@ -112,10 +112,10 @@ public class ExamStatusInfoService {
         int grade = 0;
         ExamStatusInfo examStatusInfo = examStatusInfoRepo.findExamInfoForSubject(subjectID, index);
         if(examStatusInfo == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pogresno ste uneli podatke");
         }
         if(examStatusInfo.getStatus() == Exam_status.PASSED){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Student already passed that subject");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Student je vec polozio taj predmet");
         }
 
         String userEmail = jwtService.extractUsername(token);
@@ -123,27 +123,27 @@ public class ExamStatusInfoService {
         Employee employee = employeeRepo.findByEmail(userEmail);
 
         Events events = eventsRepo.findById(eventID).orElseThrow(
-                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pogresno ste uneli podatke"));
         Subjects subject = subjectsRepo.findById(subjectID).orElseThrow(
-                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pogresno ste uneli podatke"));
 
         if(examPoints < 26 || examPoints > 50){
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Exam points scope exceeded");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Maksimum poena na ispitu je 50");
         }
 
         if(subject.getCourse() != examStatusInfo.getStudent().getCourseOfStudies()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong input");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pogresan unos");
         }
 
         Exams reportedExam = examsRepo.findIfStudentRegistratedTheExam(subjectID, eventID, index);
 
         if(reportedExam == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Student never registered for that exam for that event");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Student nije prijavio ispit u tom roku");
         }
 
         int totalColloquiumPoints = examStatusInfo.getColloquiumOne() + examStatusInfo.getColloquiumTwo() + examStatusInfo.getColloquiumThree();
         if(totalColloquiumPoints < 26){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Student doesn't have enough points via colloquiums");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Student nema predispitne obaveze za taj ispit");
         }
         int totalPoints = totalColloquiumPoints + examPoints;
         if(totalPoints > 50 && totalPoints <61){

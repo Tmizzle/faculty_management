@@ -35,16 +35,14 @@ public class FinancesService {
     public FinancesDTO getFinancesById(Integer id) {
         Finances finances = financesRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "finance entry with id " + id + " does not exist"));
-        FinancesDTO financesDTO = financesMapper.entityToDTO(finances);
-        return financesDTO;
+        return financesMapper.entityToDTO(finances);
     }
 
     public List<FinancesDTO> getFinancesForStudent(String token){
         String userEmail = jwtService.extractUsername(token);
 
         List<Finances> finances = financesRepo.financesForStudent(userEmail);
-        List<FinancesDTO> financesDTOList = financesMapper.entitiesToDTOs(finances);
-        return financesDTOList;
+        return financesMapper.entitiesToDTOs(finances);
     }
 
 

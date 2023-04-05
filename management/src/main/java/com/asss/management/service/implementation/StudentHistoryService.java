@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -41,28 +40,24 @@ public class StudentHistoryService {
     // Retrieves all student history
     public List<StudentHistoryDTO> getStudentHistory() {
         List<StudentHistory> studentHistoryList = studentHistoryRepo.findAll();
-        List<StudentHistoryDTO> studentHistoryDTOList = studentHistoryMapper.entitiesToDTOs(studentHistoryList);
-        return studentHistoryDTOList;
+        return studentHistoryMapper.entitiesToDTOs(studentHistoryList);
     }
 
     public StudentHistoryDTO getStudentHistoryById(Integer id) {
         StudentHistory studentHistory = studentHistoryRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Specified student history entry has not been found."));
-        StudentHistoryDTO studentHistoryDTO = studentHistoryMapper.entityToDTO(studentHistory);
-        return studentHistoryDTO;
+        return studentHistoryMapper.entityToDTO(studentHistory);
     }
 
     public List<StudentHistoryDTO> getStudentHistoryByIndex(String index) {
         List<StudentHistory> studentHistoryList = studentHistoryRepo.studentHistoryByIndex(index);
-        List<StudentHistoryDTO> studentHistoryDTOList = studentHistoryMapper.entitiesToDTOs(studentHistoryList);
-        return studentHistoryDTOList;
+        return studentHistoryMapper.entitiesToDTOs(studentHistoryList);
     }
 
     public List<StudentHistoryDTO> getStudentHistoryByLoggedUser(String token) {
         String userEmail = jwtService.extractUsername(token);
         List<StudentHistory> studentHistoryList = studentHistoryRepo.studentHistoryByLoggedUser(userEmail);
-        List<StudentHistoryDTO> studentHistoryDTOList = studentHistoryMapper.entitiesToDTOs(studentHistoryList);
-        return studentHistoryDTOList;
+        return studentHistoryMapper.entitiesToDTOs(studentHistoryList);
     }
 
     public void addNewStudentHistoryEntry(StudentHistory studentHistory, String token, String index) {

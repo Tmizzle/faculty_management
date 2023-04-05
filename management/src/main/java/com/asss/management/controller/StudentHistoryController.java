@@ -43,6 +43,6 @@ public class StudentHistoryController {
     public ResponseEntity addNewStudentHistory(@RequestBody StudentHistory studentHistory, @RequestParam String token, @RequestParam String index){
         studentHistoryService.addNewStudentHistoryEntry(studentHistory, token, index);
 
-        return ResponseEntity.ok("Added a new student history successfully");
+        return ResponseEntity.ok(new MyCustomResponse("Nov upis dodat uspesno!"));
     }
 }

@@ -52,11 +52,11 @@ public class StudentController {
     public ResponseEntity addNewStudent(@RequestBody Student student, @RequestParam String token){
         studentService.addNewStudent(student, token);
 
-        return ResponseEntity.ok("Added a new student successfully");
+        return ResponseEntity.ok(new MyCustomResponse("Uspesno dodat student"));
     }
 
     @PutMapping(path = "{id}")
-    public ResponseEntity updateEmployee(
+    public ResponseEntity updateStudent(
             @PathVariable("id") Integer id,
             @Parameter(description = "Session token") @RequestParam String token,
             @Parameter(description = "Student first name") @RequestParam(required = false) String firstName,
@@ -66,6 +66,6 @@ public class StudentController {
     ) {
         studentService.updateStudent(id, token, firstName, lastName, middleName, email);
 
-        return ResponseEntity.ok("Student updated successfully");
+        return ResponseEntity.ok(new MyCustomResponse("Uspesno promenjene informacije o studentu"));
     }
 }

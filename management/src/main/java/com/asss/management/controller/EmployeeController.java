@@ -44,7 +44,7 @@ public class EmployeeController {
     }
 
     @GetMapping(path = "/getEmployeeByEmail/")
-    public EmployeeDTO getEmployeeByEmail(@RequestParam String token, HttpServletResponse response){
+    public EmployeeDTO getEmployeeByEmail(@RequestParam String token){
         return employeeService.getUserInfoFromToken(token);
     }
 

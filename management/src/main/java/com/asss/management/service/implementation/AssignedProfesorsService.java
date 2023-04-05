@@ -36,28 +36,24 @@ public class AssignedProfesorsService {
     // Retrieves all assigned profesors
     public List<AssignedProfesorsDTO> getAssignedProfesors() {
         List<AssignedProfesors> assignedProfesorsList = assignedProfesorsRepo.findAll();
-        List<AssignedProfesorsDTO> assignedProfesorsDTOList = assignedProfesorsMapper.entitiesToDTOs(assignedProfesorsList);
-        return assignedProfesorsDTOList;
+        return assignedProfesorsMapper.entitiesToDTOs(assignedProfesorsList);
     }
 
     public List<AssignedProfesorsDTO> getAssignedSubjectsForLoggedUser(String token) {
         String userEmail = jwtService.extractUsername(token);
         List<AssignedProfesors> assignedProfesorsList = assignedProfesorsRepo.findByProfesor(userEmail);
-        List<AssignedProfesorsDTO> assignedProfesorsDTOList = assignedProfesorsMapper.entitiesToDTOs(assignedProfesorsList);
-        return assignedProfesorsDTOList;
+        return assignedProfesorsMapper.entitiesToDTOs(assignedProfesorsList);
     }
 
     public List<AssignedProfesorsDTO> getAssignedProfesorsBySubject(Integer subjectID) {
         List<AssignedProfesors> assignedProfesorsList = assignedProfesorsRepo.findBySubject(subjectID);
-        List<AssignedProfesorsDTO> assignedProfesorsDTOList = assignedProfesorsMapper.entitiesToDTOs(assignedProfesorsList);
-        return assignedProfesorsDTOList;
+        return assignedProfesorsMapper.entitiesToDTOs(assignedProfesorsList);
     }
 
     public AssignedProfesorsDTO getAssignedProfesorsById(Integer id) {
         AssignedProfesors assignedProfesor = assignedProfesorsRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Specified employee has not been found."));
-        AssignedProfesorsDTO assignedProfesorDTO = assignedProfesorsMapper.entityToDTO(assignedProfesor);
-        return assignedProfesorDTO;
+        return assignedProfesorsMapper.entityToDTO(assignedProfesor);
     }
 
     public void addNewAssignedProfesor(Integer profesorID, Integer subjectID) {

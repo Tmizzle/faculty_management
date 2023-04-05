@@ -17,6 +17,7 @@ import java.util.List;
 public class ExamsController {
 
     private final ExamsService examsService;
+    private Object ResponseStatus;
 
     @GetMapping
     public List<ExamsDTO> getExams(){
@@ -56,15 +57,15 @@ public class ExamsController {
                                      @RequestParam Integer subjectID){
         examsService.addNewExam(token, profesorID, subjectID);
 
-        return ResponseEntity.ok("Added a new exam registration successfully");
+        return ResponseEntity.ok(new MyCustomResponse("Added an exam registration successfully"));
     }
 
     @DeleteMapping(path = "/removeExam/")
     public ResponseEntity removeExam(@RequestParam String token,
-                                     @RequestParam Integer eventID,
-                                     @RequestParam Integer subjectID){
+                                              @RequestParam Integer eventID,
+                                              @RequestParam Integer subjectID){
         examsService.removeExam(token, eventID, subjectID);
 
-        return ResponseEntity.ok("Removed an exam successfully");
+        return ResponseEntity.ok(new MyCustomResponse("Removed an exam registration successfully"));
     }
 }

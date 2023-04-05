@@ -11,6 +11,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.Data;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,8 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Data
@@ -106,6 +109,23 @@ public class EmployeeService {
         if(jmbgCheck != null){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "JMBG already in use");
         }
+        // regular expression pattern for email validation
+        String emailRegex = "^(?!\\.)[a-zA-Z0-9._%+-]+(?!\\.|\\.{2,})[^.]@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        // check if email is valid
+        if (!pattern.matcher(employee.getEmail()).matches() || employee.getEmail().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email invalid");
+        }
+
+        // Check that the new password meets the required format
+        Pattern passwordPattern = Pattern.compile("^(?=.*\\d)(?=.*[a-zA-Z]).{8,}$");
+        Matcher passwordMatcher = passwordPattern.matcher(employee.getPassword());
+        if (!passwordMatcher.matches()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 8 chars long, contain at least 1 number and 1 letter");
+        }
+        String hashedPassword = BCrypt.hashpw(employee.getPassword(), BCrypt.gensalt());
+
+        employee.setPassword(hashedPassword);
         employee.setCreatedAt(currentDate);
         employeeRepo.save(employee);
     }

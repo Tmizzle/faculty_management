@@ -53,14 +53,14 @@ public class EventsController {
     ) {
         eventsService.updateEvent(id, name, startDate, endDate);
 
-        return ResponseEntity.ok("Event updated successfully");
+        return ResponseEntity.ok(new MyCustomResponse("Dogadjaj promenjen uspesno"));
     }
 
     @DeleteMapping(path = "{id}")
     public ResponseEntity deleteProjectMember(@Parameter(description = "ID of the event", example = "1") @PathVariable("id") Integer eventID ){
         eventsService.deleteEvent(eventID);
 
-        return ResponseEntity.ok("Event successfully removed from that project");
+        return ResponseEntity.ok(new MyCustomResponse("Uspesno uklonjen dogadjaj"));
     }
     @PostMapping(path = "/defineSemesters/")
     public ResponseEntity defineSemesters(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date firstSemStartDate,
@@ -69,6 +69,6 @@ public class EventsController {
                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date secondSemEndDate){
         eventsService.defineSemesters(firstSemStartDate, firstSemEndDate, secondSemStartDate, secondSemEndDate);
 
-        return ResponseEntity.ok("Defined semesters successfully");
+        return ResponseEntity.ok(new MyCustomResponse("Definisanje semestra uspesno"));
     }
 }
